@@ -1,0 +1,107 @@
+<!DOCTYPE html5>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+		<link rel = "stylesheet" href = "css/external/bootstrap.css" />
+		<!-- <link rel = "stylesheet" href = "css/external/bootstrap-rtl.css" /> -->
+		<link rel = "stylesheet" id='bootstrap-rtl-css' href='css/external/bootstrap.rtl.min.css?ver=3.3.7.3' type='text/css' />
+		<link rel = "stylesheet" href = "css/index.css" />
+		<script src="js/external/jquery.js"></script>
+		<script src="js/external/jquery.form.js"></script>
+		<script src="js/external/bootstrap.min.js"></script>
+		<!-- <script src="cordova.js"></script> -->
+		<script type = "text/javascript" src="js/index.js"></script>
+		<script type = "text/javascript" src="js/Functions.js"></script>
+	</head>
+	<body>
+		<div id="NavigationBar">
+			<nav class="navbar navbar-light navbar-fixed-top" style="background-color: #075e54;">
+			  <div class="container">
+				  <div class="navbar-header">
+					  <button type="button" class="navbar-toggle collapsed NavBarBtnStyle" data-toggle="collapse" data-target="#navbarSupportedContent" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span> 
+					  </button>
+					  <span class="navbar-brand">RMO</span>
+				  </div>
+				  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="nav navbar-nav">
+					  <li class="nav-item">
+						<a class="nav-link" id="MenuTryAgainBtn" href="#">נסה שוב</a>
+					  </li>
+					  <li class="nav-item disabled">
+						<a class="nav-link" id="EndEventBtn" href="#">סיים אירוע</a>
+					  </li>
+					  <li class="nav-item">
+						<a class="nav-link" href="#">הגדרות</a>
+					  </li>
+					  <li class="nav-item">
+						<a class="nav-link" id="MenuLogOutBtn" href="#">התנתק</a>
+					  </li>
+					</ul>
+				  </div>
+			  </div>
+			</nav>
+		</div>
+		<div class="contianer">
+			<div class="row">
+				<div class="col-sm-2 col-sm-offset-5" style="margin-top:60px">
+					<form id="LoginForm" dir="rtl">
+						<div class="form-group">
+							<h2><label for="InputUserName" class="UsernameLabelStyle">שם משתמש:</label></h2>
+							<input type="text" class="form-control input-lg InputUsernameStyle" id="InputUserName" placeholder="שם משתמש" value="">
+						</div>
+						<div class="form-group">
+							<h2><label for="InputPassword" class="PasswordLabelStyle">סיסמא:</label></h2>
+							<input type="password" class="form-control input-lg InputPasswordStyle" id="InputPassword" placeholder="סיסמא" value="">
+						</div>
+						
+						<button id="SubmitLogin" type="submit" class="btn btn-primary SubmitLoginStyle" style="margin-right:160px">התחבר</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div id="Events" class="EventsStyle"></div>
+		<div id="ActiveEventDiv" class="ActiveEventDivStyle">
+			<div class="contianer">
+				<div class="row">
+					<div class="col-xs-12 col-xs-offset-5" style="color:red;">
+							<label id="eventName"></label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-8 col-xs-offset-2" style="background-color: red;">
+						<div class="row">
+							<div class="col-xs-12 col-xs-offset-5" style="color:blue; background-color: green;">
+								<label id="eventID"></label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-xs-offset-5" style="color:green;">
+						<label id="eventLocation"></label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-xs-offset-5" style="color:black;">
+						<p id="eventDescription"></p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-xs-offset-3" style="">
+						<img id="eventPicture" style="height:300px;"></img>
+					</div>
+					<div class="col-xs-12 col-xs-offset-3" style="">
+						<button id="ChangePic" type="button" class="btn btn-primary ChangePicBtnStyle" style="">החלף תמונה</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<label id="showLocation"></label><br>
+	</body>
+</html>
+

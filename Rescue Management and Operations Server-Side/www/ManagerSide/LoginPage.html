@@ -1,0 +1,38 @@
+<!DOCTYPE html5>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel = "stylesheet" href = "css/external/bootstrap.css" />
+		<link rel = "stylesheet" href = "css/external/bootstrap-rtl.css" />
+		<link rel = "stylesheet" href = "css/LoginPage.css" />
+		<script src="js/external/jquery.js"></script>
+		<script src="js/external/jquery.form.js"></script>
+		<script src="js/external/bootstrap.min.js"></script>
+		<script type = "text/javascript" src="js/LoginPage.js"></script>
+		<script type = "text/javascript" src="js/Functions.js"></script>
+	</head>
+	<body dir="rtl">
+		<h1 style="text-align:center; margin-top:50px; font-weight:bold; font-size:80px;">ניהול ואגון יחידת חילוץ</h1>
+		<div class="contianer">
+			<div class="row">
+				<div class="col-sm-2 col-sm-offset-5" style="margin-top:60px">
+					<form id="SignInForm" class="SignInFormStyle">
+						<div class="form-group">
+							<h2><label for="InputUserName" class="SignInlabelStyle">שם משתמש:</label></h2>
+							<input type="text" class="form-control input-lg" id="InputUserName" placeholder="שם משתמש" value="">
+						</div>
+						<div class="form-group">
+							<h2><label for="InputPassword" class="SignInlabelStyle">סיסמא:</label></h2>
+							<input type="password" class="form-control input-lg" id="InputPassword" placeholder="סיסמא" value="">
+						</div>
+						<div class="form-check">
+							<label class="form-check-label LoginLabelCheckboxStyle">
+							<input id="LoginCheckbox" type="checkbox" class="form-check-input LoginCheckboxStyle"> זכור אותי</label>
+						</div>
+						<button id="SignInSubmitBtn" type="submit" class="btn btn-primary SignInSubmitStyle" style="margin-right:160px">התחבר</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

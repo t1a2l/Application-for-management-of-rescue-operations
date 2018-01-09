@@ -1,0 +1,13 @@
+{
+  "name": "rescue-management-operations",
+  "version": "1.0.0",
+  "description": "a system for rescue teams",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "t1a2l",
+  "license": "ISC"
+}

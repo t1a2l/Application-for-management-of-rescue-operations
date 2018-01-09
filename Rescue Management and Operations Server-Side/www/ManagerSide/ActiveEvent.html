@@ -1,0 +1,43 @@
+<!DOCTYPE html5>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="stylesheet" href="css/external/bootstrap.css" />
+		<link rel="stylesheet" href="css/external/bootstrap-rtl.css" />
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+		<link rel="stylesheet" href="../node_modules/leaflet-toolbar/dist/leaflet.toolbar.css"/>
+		<link rel="stylesheet" href="../node_modules/leaflet-draw-toolbar/dist/leaflet.draw-toolbar.css"/>
+		<link rel="stylesheet" href="css/ActiveEvent.css" />
+		<script src="js/external/jquery.js"></script>
+		<script src="js/external/jquery.form.js"></script>
+		<script src="js/external/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3-dr-MD9cMEU2kogoVyshvrxDP8O574Q&language=iw"></script>
+		<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""
+		></script>
+		<script src="../node_modules/leaflet-toolbar/dist/leaflet.toolbar-src.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw-src.js"></script>
+		<script src="../node_modules/leaflet-draw-toolbar/dist/leaflet.draw-toolbar.js"></script>
+		<script type="text/javascript" src="../node_modules/leaflet-draw-toolbar/examples/ColorPicker.js"></script>
+		<script type="text/javascript" src="js/ActiveEvent.js"></script>
+		<script type="text/javascript" src="js/Functions.js"></script>
+	</head>
+	<body>
+		<div class="contianer">
+			<h1 id="eventName" style="text-align:center; font-weight:bold; font-size:60px;"></h1>
+			<div class="row">
+				<div class="col-sm-2 col-sm-offset-2" style="margin-top:30px">
+					<div id="mapid" style="height: 600px; width:900px"></div>
+				</div>
+				<div class="col-sm-2 col-sm-offset-5" style="margin-top:30px">
+					<h3 id="eventId" style="text-align:center; margin-top:10px; font-weight:bold; font-size:30px;"></h3>
+				</div>
+				<div class="col-sm-2 col-sm-offset-5" style="margin-top:30px">
+					<h4 id="eventStartTime" style="text-align:center; margin-top:10px; font-weight:bold; font-size:30px;"></h4>
+				</div>
+				<div class="col-sm-1" style="margin-top:30px">
+					<button type="button" class="btn btn-default" id="endEvent" style="height:40px;">סיים אירוע</button>
+				</div>
+			</div>
+	</body>
+</html>
