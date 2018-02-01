@@ -1,10 +1,19 @@
-.NavBarBtnStyle:after{
+body{
+	background: linear-gradient(to right, red , orange, yellow);
+	margin: 0; 
+	height: 100%; 
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+
+.NavBarBtnStyle:after{ /*Navigation bar styling*/
 	content: '\2807';
 	font-size: 25px;
 	color: white;
 }
 
-.navbar-toggle {
+.navbar-toggle { /*Navigation bar styling*/
     float: left;
     margin-left: 15px;
     margin-right: auto;
@@ -12,177 +21,96 @@
     margin-bottom: -15px;
 }
 
+h1{ /*Headline styling*/
+	text-align:center;
+	margin-top:70px; 
+	font-weight:bold;
+	background: -webkit-linear-gradient(blue, green);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.LoginLabelStyle{ /*Login Info styling*/
+	font-weight:bold;
+	font-size: 20px;
+	background: -webkit-linear-gradient(black, green);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	margin-top:20px; 
+}
+
+.LoginInputStyle{ /*Login Info styling*/
+	width: 250px;
+}
+
+.SubmitLoginStyle{ /*Login button styling*/
+	background-color: LimeGreen;
+	margin-top: 20px;
+	margin-right: 80px;
+	width: 100px;
+	color: white;
+	font-weight:bold;
+	font-size:20px;
+	font-family: "Times New Roman", Times, serif;
+}
+
+.navbar-brand{
+	font-size: 18px;
+	font-weight: bold;
+	background: -webkit-linear-gradient(red, yellow);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+a{
+	color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.eventNameStyle{
+	margin-right: 10px;
+	font-size: 25px;
+	background: -webkit-linear-gradient(red, blue);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.eventLocationStyle{
+	margin-right: 10px;
+	font-size: 20px;
+	background: -webkit-linear-gradient(red, blue);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.eventPictureStyle{
+	height:250px;
+	width: 160px;
+}
+
+.ChangePicBtnStyle{
+	background-color: AliceBlue;
+	margin-top: 20px;
+	margin-right: 20px;
+	width: 120px;
+	color: black;
+	font-weight:bold;
+	font-size:15px;
+}
+
+.eventDescriptionTitleStyle{
+	margin-right: 10px;
+	font-size: 25px;
+	background: -webkit-linear-gradient(red, blue);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+.eventDescriptionStyle{
+	margin-right: 10px;
+	font-size: 20px;
+	color: black;
+	font-weight:bold;
+}
 
 
-/* body{ */
-	/* background-image: url('../img/LoginBackGroundImage.jpg'); */
-    /* background-size: 110% 100%; */
-    /* background-repeat: no-repeat; */
-    /* background-position: center; */
-/* } */
-
-/* #EventsTable{  */
-	/* font-family:Arial, Helvetica, Sans-Serif;  */
-    /* font-size:0.8em; */
-	/* border-collapse:collapse; */
-    /* font-weight: bold; */
-/* } */
-
-/* #EventsTable h4{  */
-	/* margin:0px;  */
-	/* padding:0px; */
-    /* font-weight: bold; */
-/* } */
-
-
-/* #EventsTable th{ */
-    /* background: blue; */
-    /* font-weight: bold; */
-    
-/* }; */
-
-/* #EventsTable img{  */
-	/* float:right; */
-/* } */
-
-/* #EventsTable ul{  */
-	/* margin:10px 0 10px 40px;  */
-	/* padding:0px; */
-
-/* } */
-
-/* #EventsTable td{  */
-	/* background:#8799DE none repeat-x scroll center left;  */
-	/* color:#000;  */
-	/* padding:10px 25px;  */
-    /* text-align: center; */
-    /* border: 1px solid black; */
-    /* border-collapse: collapse; */
-    
-    /* font-weight: bolder; */
-
-/* } */
-
-/* #EventsTable div.up{  */
-	/* background-position:100px 100px; */
-/* } */
-
-/* .myparaStyle{ */
-    /* display: block; */
-    /* margin-top: 1em; */
-    /* margin-bottom: 1em; */
-    /* margin-left: 0; */
-    /* margin-right: 0; */
-    /* color: red; */
-    /* background-color: blue; */
-/* } */
-
-/* .UsernameLabelStyle{ */
-	/* font-weight: bold; */
-    /* font-family: "Times New Roman", Georgia, Serif; */
-    /* border-radius: 18px; */
-    /* padding-left: 40px; */
-	/* font-size: 20px; */
-    /* padding-top: 175px; */
-    /* color: #7EBCBA; */
-    
-    /* float:right; */
-/* } */
-
-/* .InputUsernameStyle{ */
-	/* font-family: "Times New Roman", Georgia, Serif; */
-    /* border-radius: 18px; */
-    /* width: 200px; */
-	/* margin-left: 40px; */
-    /* font-size: 20px; */
-    /* padding-right: 10px; */
-    /* margin-top: 20px; */
-  
-/* } */
-
-/* .PasswordLabelStyle{ */
-	/* font-weight: bold; */
-    /* font-family: "Times New Roman", Georgia, Serif; */
-    /* border-radius: 18px; */
-    /* padding-top: 30px; */
-	/* font-size: 20px; */
-    /* display: block; */
-    /* color: #7EBCBA; */
-
-    
-    
-/* } */
-
-/* .InputPasswordStyle{ */
-	/* font-family: "Times New Roman", Georgia, Serif; */
-    /* border-radius: 18px; */
-    /* width: 200px; */
-	/* margin-left: 40px; */
-    /* font-size: 20px; */
-    /* display: block; */
-    /* padding-right: 10px; */
-    
-    
-
-/* } */
-
-/* .SubmitLoginStyle{ */
-    /* display: inline-block; */
-	/* font-weight: bold; */
-    /* font-size: 24px; */
-    /* font-family: "Times New Roman", Georgia, Serif; */
-    /* margin-top: 120px; */
-	/* margin-left: 150px; */
-    /* margin-right: 120px; */
-	/* font-size: 20px; */
-    /* border-radius: 10%; */
-    /* width: 100px; */
-    /* height: 50px; */
-    /* background-color: #260633; */
-    /* color: #7EBCBA; */
-/* } */
-
-/* .TryAgainButtonStyle{ */
-    /* background-color: #1B2791; */
-   
-    /* float: right; */
-    /* width: 90px; */
-    /* height: 100px: */
-/* } */
-
-/* .LogOutButtonStyle{ */
-   /* background-color: #E15749; */
-   /* width: 90px; */
-   /* height: 100px: */
-   
-/* } */
-
-/* .locButtonStyle{ */
-    /* background-color: red; */
-    /* border-radius: 5px; */
-
-/* } */
-
-/* .LogOutButton{ */
-   /* background-color: red; */
-   /* opacity: 0.9; */
-    /* border-radius: 5px; */
-     /* width: 50px; */
-    /* height: 70px: */
-/* } */
-
-/* .JoinButtonStyle{ */
-    /* background-color: green; */
-    /* border-radius: 5px; */
-/* } */
-
-/* #Details{ */
-  /* /* background-color: green;*/ */
-  /* /*  box-shadow: 10px 10px 5px grey;*/ */
-    /* border-radius: 5px; */
-/* } */
-/* #ActiveEventDiv{ */
-    /* background-color: blue; */
-    /* border-radius: 5px; */
-
-/* } */

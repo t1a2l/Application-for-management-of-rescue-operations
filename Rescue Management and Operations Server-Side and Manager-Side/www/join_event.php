@@ -2,10 +2,11 @@
 
 // This page hanles the event joining of the different clients: 
 // On the first joining - create a table for the client
-// On rejoin point the client to the correct table
+// On rejoin - point the client to the correct table
 
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json; charset=iso-8859-1');
 
 if(isset($_POST['session_id']))
 {

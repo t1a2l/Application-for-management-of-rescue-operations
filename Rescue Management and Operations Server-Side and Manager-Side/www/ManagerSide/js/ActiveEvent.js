@@ -5,8 +5,9 @@ var mainFunction = (function()
 	var lastPointArr = []; // Array that save the lastest points 
 	var mymap; // The map object
 	var marker; // The marker object
-	var locationInterval;
-	
+	var locationInterval; // send location evry minute or so
+	var AreaColor = "black"; // color of the search areas
+	var AreaNum = 0;
 	
 	function GetEventProperties(){ // Event properties request from server
 		var GetEventData = {
@@ -51,25 +52,8 @@ var mainFunction = (function()
 				var latitude = results[0].geometry.location.lat();
 				var longitude = results[0].geometry.location.lng();
 				var zoom = 13;
-				mymap = L.map('mapid').setView([latitude, longitude], zoom),
-						drawnItems = new L.FeatureGroup().addTo(mymap),
-						editActions = [
-								L.Toolbar2.EditAction.Popup.Edit,
-								L.Toolbar2.EditAction.Popup.Delete,
-								L.Toolbar2.Action.extendOptions({
-										toolbarIcon: { 
-											className: 'leaflet-color-picker', 
-											html: '<span class="fa fa-eyedropper"></span>' 
-										},
-										subToolbar: new L.Toolbar2({ actions: [
-											L.ColorPicker.extendOptions({ color: '#db1d0f' }),
-											L.ColorPicker.extendOptions({ color: '#025100' }),
-											L.ColorPicker.extendOptions({ color: '#ffff00' }),
-											L.ColorPicker.extendOptions({ color: '#0000ff' })
-										]})
-								})
-						];
-
+				mymap = L.map('mapid').setView([latitude, longitude], zoom);
+						
 				L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 				{
 					attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -77,86 +61,130 @@ var mainFunction = (function()
 					subdomains: ['a','b','c']
 				}).addTo(mymap);
 				
+				var TitleTxtBox = L.Control.extend({
+					options: {
+						position: 'bottomleft' 
+					},
+					onAdd: function (mymap) {
+						var container = L.DomUtil.create('input', 'myInput');
+					 
+						container.style.backgroundColor = 'white';
+						container.style.width = '100px';
+						container.style.height = '20px';
+					
+					return container;
+				    },
+				  
+				    onRemove: function(mymap) {
+							// Nothing to do here
+				    },
+				    getContent: function () {
+						this.getContainer().innerHTML;
+				    }
+				  
+				});
+					
+				var ShapeTitle =  new TitleTxtBox().addTo(mymap);
 				
-				new L.Toolbar2.DrawToolbar({
-					position: 'topleft',
-				}).addTo(mymap);
+				var editActions = [
+						L.Toolbar2.EditAction.Popup.Edit,
+						L.Toolbar2.EditAction.Popup.Delete,
+						L.Toolbar2.Action.extendOptions({
+							toolbarIcon: { 
+								className: 'leaflet-control-button', 
+								html: ''
+							}, 
+							subToolbar: new L.Toolbar2({ actions: [
+								L.ShapeTitle.extendOptions({title: ShapeTitle.getContent()})
+							]})
+						}),
+						L.Toolbar2.Action.extendOptions({
+							toolbarIcon: { 
+								className: 'leaflet-color-picker', 
+								html: '<span class="fa fa-eyedropper"></span>' 
+							},
+							subToolbar: new L.Toolbar2({ actions: [
+								L.ColorPicker.extendOptions({ color: '#db1d0f' }),
+								L.ColorPicker.extendOptions({ color: '#025100' }),
+								L.ColorPicker.extendOptions({ color: '#ffff00' }),
+								L.ColorPicker.extendOptions({ color: '#0000ff' })
+							]})
+						})
+				];
 				
-				// new L.Toolbar2.EditToolbar.Control({
-					// position: 'topleft'
-				// }).addTo(mymap, drawnItems);
-				
-				// L.DrawToolbar.include({
-					// getModeHandlers: function(map) {
-						// return [
-							// {
-								// enabled: this.options.polygon,
-								// handler: new L.Draw.Polygon(map, this.options.polygon),
-								// title: L.drawLocal.draw.toolbar.buttons.polygon
-							// },
-							// {
-								// enabled: true,
-								// handler: new L.ColorPicker({
 								
+				var drawControl = new L.Control.Draw({
+					draw: {
+						polyline: false,
+						polygon: {
+						  allowIntersection: false, // Restricts shapes to simple polygons
+						  drawError: {
+							color: 'black', // Color the shape will turn when intersects
+							message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+						  },
+						  shapeOptions: {
+							color: AreaColor //'#bada55'
+						  }
+						},
+						circle: false,
+						circlemarker: false,
+						rectangle: false,
+						marker: false
+					}
+				});
+				mymap.addControl(drawControl);
+
+				var getPopupContent = function(layer) {
+					if (layer instanceof L.Polygon) {
+						var latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs(),
+						area = L.GeometryUtil.geodesicArea(latlngs);
+						return "Area: "+L.GeometryUtil.readableArea(area, true);
+					}
+					return null;
+				}
 								
-								
-								// }),
-								// title: "colors"
-							// }
-						// ];
-					// }
-				// });
-								
-				// var drawControl = new L.Control.Draw({
-					// draw: {
-						// polyline: false,
-						// polygon: {
-						  // allowIntersection: false, // Restricts shapes to simple polygons
-						  // drawError: {
-							// color: '#e1e100', // Color the shape will turn when intersects
-							// message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
-						  // },
-						  // shapeOptions: {
-							// color: '#bada55'
-						  // }
-						// },
-						//circle: false,
-						// rectangle: false,
-						// marker: false
-					// }
-					// edit: {
-						// featureGroup: drawnItems
-					// }
-				// });
-				// mymap.addControl(drawControl);
+				drawnItems = new L.FeatureGroup().addTo(mymap);
 				
 				mymap.on('draw:created', function(evt) {
 					var	type = evt.layerType,
 						layer = evt.layer;
-
+					var content = "area" + AreaNum;
+					AreaNum++;
 					drawnItems.addLayer(layer);
-
+					latLngs = layer.getLatLngs(); // get cordinates and save to database
+					layer.bindPopup(content);
+										
+					var drawings = drawnItems.getLayers();  //drawnItems is a container for the drawn objects
+					
 					layer.on('click', function(event) {
+												
 						new L.Toolbar2.EditToolbar.Popup(event.latlng, {
 							actions: editActions
 						}).addTo(mymap, layer);
 					});
+					// mymap.on('click', '.myInput',function(event) {
+						// mymap.removeControl(Input1);
+					// });
+					
 				});
 				
-				// map.on('draw:editstart', function (e) {
-					// var type = e.layerType;
-					// var layer = e.layer;
-					// if (type === 'marker') {
-							
-					// }
-					
-				// });
+				
+				
+				mymap.on('draw:edited', function(event) {
+					var layers = event.layers, content = null;
+					layers.eachLayer(function(layer) {
+						content = getPopupContent(layer);
+						if (content !== null) {
+							layer.setPopupContent(content);
+						}
+					});
+				});
+				
 			}
 		});
 	}
 	
-	
-	
+		
 	function GetMarkers(){  // Get active volunteers location on the map in the current event
 		var TimeStampObject = {
 			TimeStampLocation : TimeStampLocationValue
@@ -232,9 +260,13 @@ var mainFunction = (function()
 		GetEventProperties();
 		$(document).on("click", "#endEvent", function(){ // log out from app
 			event.preventDefault();
-			//if(locationInterval)
-			//	clearInterval(locationInterval);
-			EventEnd();
+			var answer = confirm("אתה בטוח שאתה רוצה לסיים את האירוע?");
+			if(answer)
+			{
+				//if(locationInterval)
+				//	clearInterval(locationInterval);
+				EventEnd();
+			}
 		});
 		
 		

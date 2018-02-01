@@ -50,22 +50,31 @@ var mainFunction = (function()
 	}
 	
 	function GetLocationsResult(response){
-		results = JSON.parse(response);
-		if(results)
+		response = response.trim();
+		if(response == "")
 		{
-			$("#EventLoc").select2({
-				data: results
-			});
+			alert("שגיאה באיחזור נתונים");
 		}
 		else
 		{
-			var defaultText = [{
-        		id: 0,
-        		text: 'Nothing'
-   			}];
-			$("#EventLoc").select2({
-				data: defaultText
-			});
+			results = JSON.parse(response);
+			if(results)
+			{
+				$("#EventLoc").select2({
+					dir: "rtl",
+					data: results
+				});
+			}
+			else
+			{
+				var defaultText = [{
+					id: 0,
+					text: 'Nothing'
+				}];
+				$("#EventLoc").select2({
+					data: defaultText
+				});
+			}
 		}
 	}
 		

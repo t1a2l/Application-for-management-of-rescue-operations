@@ -16,53 +16,43 @@ function ajaxRequest(SendObject, serverPage, myfunction)
 	});
 }
 
-function DropDownPopulate(objectFromServer, selectBoxArray, propertyNameArray)
-{
-		if(objectFromServer == null) 
-		{
-			alert("בעיה במילוי התיבה!");
-			return;
-		}
-		var i;
-		for(i = 0; i < objectFromServer.length; i++)
-		{
-			var k;
-			for(k = 0; k < objectFromServer[i].length; k++)
-			{
-				selectBoxArray[i].options[selectBoxArray[i].options.length] = new Option(objectFromServer[i][k][propertyNameArray[i]], objectFromServer[i][k][propertyNameArray[i]]);
-			}
-		}
-		
+function lightOrDark(bgcolor){
+	var r, b, g, hsp; 
+	var a = bgcolor;
+
+	if(a.match(/^rgb/)) 
+	{
+	  a = a.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
+	  r = a[1];
+	  g = a[2];
+	  b = a[3];
+	} 
+	else {
+	  a = +("0x" + a.slice(1).replace(a.length < 5 && /./g, '$&$&'));
+	  r = a >> 16;
+	  g = a >> 8 & 255;
+	  b = a & 255;
+	}
+
+	hsp = Math.sqrt(
+	  0.299 * (r * r) +
+	  0.587 * (g * g) +
+	  0.114 * (b * b)
+	);
+
+	if(hsp > 127.5) 
+	{
+	  return "light";
+	} 
+	else 
+	{
+	  return "dark";
+	}
 }
 
 
-function Sort(MyArr, sortVar, property) // Sorting dates ascending/descending
-{ 
-		
-		if(sortVar == 0)
-		{
-			MyArr.sort(function(a, b){ // Sorting dates ascending
-				if(a[property] > b[property]) 
-					return -1
-				else if (a[property] < b[property]) 
-					return 1 
-				else  
-					return 0 
-			});
-		}
-		else if(sortVar == 1)
-		{
-			MyArr.sort(function(a, b){ // Sorting dates descending
-				if(a[property] > b[property]) 
-					return 1
-				else if (a[property] < b[property])
-					return -1 
-				else  
-					return 0
-			});
-		}
-		return MyArr;
-}
+
+
 
 
 

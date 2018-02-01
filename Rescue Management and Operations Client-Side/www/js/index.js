@@ -3,13 +3,14 @@ var mainFunction = (function()
 	document.addEventListener("deviceready", onDeviceReady, false);
 	var ActiveSession; // the active session
 	var Events = null;
-	var webURL = "http://e734e372.ngrok.io"; // server url
+	var webURL = "http://795c22a4.ngrok.io"; // server url
 	var inEvent = false;
 	var bgGeo = null; // init inside getLocation()
 	var EventNum;
 	var ChosenEvent = [];
 	var imageArr = [];
 	var currentImage;
+	var BackGroundColorArr = [];
 	
 	function SubForm() // Send login info to server and recieve a session to work with
 	{ 
@@ -55,11 +56,14 @@ var mainFunction = (function()
 		
 	function showEvents(response) // Show on going events table
 	{
+		$("#Events").html('');
 		Events = response;
 		$('.collapse').collapse('hide');
 		$("#NavigationBar").show();
 		NumOfEvents = Events.length; // Number of events
-		var listGroup = $('<div class="list-group">');
+		var container = $('<div class="contianer">');
+		var row = $('<div class="row">');
+		var listGroup = $('<div class="col-xs-8 col-xs-offset-2 list-group">');
 				
 		for(var i = 0; i < NumOfEvents; i++) // Go through all event s and show them
 		{
@@ -67,12 +71,45 @@ var mainFunction = (function()
 			var eventName = Events[i].event_name; // Event name
 			var eventLocation = Events[i].place; // Event location
 			var eventDescription = Events[i].description; // Event description
-			var buttonInfo = $('<button type="button" class="list-group-item" id="'+ eventId +'"><h3 class="list-group-item-heading">' + eventName + '</h3><h4 class="list-group-item-heading">' + eventLocation+ '</h4><p class="list-group-item-text">'+ eventDescription + '</p></button>');
-
+			var buttonInfo = $('<button type="button" class="list-group-item" id="'+ eventId +'"><label class="list-group-item-heading">' + eventName + '</label><br><label class="list-group-item-heading eventLocStyle">' + eventLocation+ '</label><br><p class="list-group-item-text">'+ eventDescription + '</p></button>');
+			var bgcolor = chooseBtnColor(); // Choose acolor for button background
+			buttonInfo.css('backgroundColor', bgcolor);
+			buttonInfo.css('margin-top', '20px');
+			var rgb = buttonInfo.css('backgroundColor'); // Get rgb color
+			var brightness = lightOrDark(rgb); // Check color brightness
+			if(brightness == "light") // Set text acorrding
+			{
+				buttonInfo.children()[0].style.color = "black";
+				buttonInfo.children()[2].style.color = "black";
+				buttonInfo.children()[4].style.color = "black";
+			}
+			else
+			{
+				buttonInfo.children()[0].style.color = "white";
+				buttonInfo.children()[2].style.color = "white";
+				buttonInfo.children()[4].style.color = "white";
+			}
+			BackGroundColorArr.push(bgcolor); // Save color to avoid repeat
 			listGroup.append(buttonInfo);
 		}
-		$('#Events').append(listGroup);
+		row.append(listGroup);
+		container.append(row);
+		$('#Events').append(container);
 		$("#Events").show();
+		$('.nav li.Settings').removeClass('disabled');
+	}
+	
+	function chooseBtnColor(){ // Choose a background color of the event button
+		var letters = '0123456789ABCDEF';
+		var color = '#';
+		for (var i = 0; i < 6; i++) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		for (var j = 0; j < BackGroundColorArr.length; j++) {
+			if(BackGroundColorArr[j] == color)
+				color = chooseBtnColor();
+		}
+		return color;
 	}
 	
 	function joinEvent(id) // Send the id of the event to join
@@ -104,12 +141,14 @@ var mainFunction = (function()
 	function showActiveEvent() // show event detailes and send locations to manager
 	{ 
 		document.getElementById('eventName').innerHTML = ChosenEvent["event_name"];
-		document.getElementById('eventID').innerHTML = "מספר אירוע: " + ChosenEvent["event_id"];
-		document.getElementById('eventLocation').innerHTML = "מיקום: " + ChosenEvent["event_location"];
-		document.getElementById('eventDescription').innerHTML = "תיאור: " + ChosenEvent["event_description"];
+		document.getElementById('eventLocation').innerHTML = ChosenEvent["event_location"];
+		document.getElementById('eventDescription').innerHTML = ChosenEvent["event_description"];
 		getImages();
 		$("#showLocation").show();
-		getLocation();
+		$('.nav li.EndEvent').removeClass('disabled');
+		$('.nav li.LogOut').addClass('disabled');
+		$('.nav li.TryAgain').addClass('disabled');
+		//getLocation();
 	}
 	
 	function getImages() // Get images from the server related to the event
@@ -126,23 +165,23 @@ var mainFunction = (function()
 			response = response.replace(/\\\//g, "/");
 			imageArr = JSON.parse(response);
 			currentImage = imageArr[0];
-			document.getElementById("eventPicture").src = imageArr[0];
+			document.getElementById("eventPicture").src = currentImage;
 		}
 	}
 	
 	function ChangePicture() // Change the displayed picture of the current event
 	{
 		var ImageIndex = imageArr.indexOf(currentImage);
-		if(ImageIndex == imageArr.length - 1)
+		if(ImageIndex == imageArr.length - 1) // The last picture
 		{
 			currentImage = imageArr[0];
-			document.getElementById("eventPicture").src = imageArr[0];
 		}
-		else
+		else // Other pictures
 		{
-			document.getElementById("eventPicture").src = imageArr[ImageIndex++];
-			currentImage = imageArr[ImageIndex++];
+			ImageIndex++;
+			currentImage = imageArr[ImageIndex];
 		}
+		document.getElementById("eventPicture").src = currentImage;
 	}
 		
 	function getLocation()
@@ -233,6 +272,10 @@ var mainFunction = (function()
 	
 	function EventEnd(){ // Event ended by manager
 		bgGeo.stop();
+		ChosenEvent["event_id"]
+		$('.nav li.EndEvent').addClass('disabled');
+		$('.nav li.LogOut').removeClass('disabled');
+		$('.nav li.TryAgain').removeClass('disabled');
 		$("#ActiveEventDiv").hide();
 		$("#showLocation").hide();
 		$("#Events").show();
@@ -240,7 +283,7 @@ var mainFunction = (function()
 	}
 	
 	function LogOut() // Request to log out from app
-	{ 
+	{
 		var logout = {session_id : ActiveSession};
 		ajaxRequest(logout, webURL + "/logout.php", LogOutResult);
 	}
@@ -305,11 +348,18 @@ var mainFunction = (function()
 		
 		$(document).on("click", "#MenuTryAgainBtn", function(){ // Refresh events page
 			event.preventDefault();
-			getEvents(ActiveSession);
+			BackGroundColorArr = [];
+			var tryagain = "success" + ActiveSession;
+			getEvents(tryagain);
 		});
 		
 		$(document).on("click", "#MenuEndEventBtn", function(){ // Finish the participating in the event
 			event.preventDefault();
+			var myanswer = confirm("אתה בטוח שאתה רוצה לסיים את האירוע?");
+			if(myanswer)
+			{
+				EventEnd();
+			}
 		});
 				
 		$(document).on("click", "#MenuSettingsBtn", function(){ // Change app settings (in the future)
@@ -318,7 +368,11 @@ var mainFunction = (function()
 				
 		$(document).on("click", "#MenuLogOutBtn", function(){ // Log out form the app and back to the login screen
 			event.preventDefault();
-			LogOut();
+			var answer = confirm("אתה בטוח שאתה רוצה להתנתק?");
+			if(answer)
+			{
+				LogOut();
+			}
 		});
 		
 		$(document).on("click", "#ChangePic", function(){ // Change Displayed picture
@@ -329,9 +383,9 @@ var mainFunction = (function()
 		$(document).on("click", ".list-group-item", function(){ // Choose an event to participate in
 			var id = $(this).attr("id"); 
 			ChosenEvent["event_id"] = id;
-			ChosenEvent["event_name"] = $(this).children("h3").text();
-			ChosenEvent["event_location"] = $(this).children("h4").text(); 
-			ChosenEvent["event_description"] = $(this).children("p").text(); 
+			ChosenEvent["event_name"] = $(this).children()[0].textContent;
+			ChosenEvent["event_location"] = $(this).children()[2].textContent; 
+			ChosenEvent["event_description"] = $(this).children()[4].textContent; 
 			joinEvent(id);
 		});
 
