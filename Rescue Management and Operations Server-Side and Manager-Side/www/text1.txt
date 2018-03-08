@@ -1,0 +1,1 @@
+'INSERT INTO event____			(user_name,latitude,longitude,timestamp) VALUES (\'\', \'32.4855291\', \'35.0951143\', \'2018/03/06 18:33:11\')'

@@ -27,7 +27,7 @@ var mainFunction = (function()
 		
 		$(document).on("click", "#joinEventBtn", function(){ // Return to active evnet
 			event.preventDefault();
-			window.location.href = "ActiveEvent.html";
+			window.location.href = "JoinEvent.html";
 		});
 		
 		$(document).on("click", "#logoutBtn", function(){ // log out from system

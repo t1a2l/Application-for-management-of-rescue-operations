@@ -9,30 +9,15 @@ var mainFunction = (function()
 	var AreaColor = "black"; // color of the search areas
 	var AreaNum = 0;
 	
-	function GetEventProperties(){ // Event properties request from server
-		var GetEventData = {
-			EventDataBit : true
-		};
-		var GetCurrentEvent = {EventProperties : GetEventData};
-		ajaxRequest(GetCurrentEvent, webURL + "/event_properties.php", EventPropertiesResults);
+	function EventInfo(){
+		var ChosenEvent = JSON.parse(localStorage.getItem("ChosenEvent"));
+		document.getElementById("eventName").innerHTML = ChosenEvent[0].event_name;
+		document.getElementById("eventId").innerHTML = "מספר אירוע: " + ChosenEvent[0].event_id;
+		document.getElementById("eventStartTime").innerHTML = "האירוע התחיל ב: " + ChosenEvent[0].s_time;
+		ShowMap();
+		//locationInterval = setInterval(GetMarkers, 120000);
 	}
-	
-	function EventPropertiesResults(response){ // Event properties from server
-		if(typeof response === 'string')
-		{
-			alert("אין אירועים פעילים");
-			window.location.href = "MainPage.html";
-		}
-		else
-		{
-			document.getElementById("eventName").innerHTML = response[0]["event_name"];
-			document.getElementById("eventId").innerHTML = "מספר אירוע: " + response[0]["event_id"];
-			document.getElementById("eventStartTime").innerHTML = "האירוע התחיל ב: " + response[0]["s_time"];
-			ShowMap();
-			//locationInterval = setInterval(GetMarkers, 120000);
-		}
-	}
-
+		
 	function MapArea(){ // Display map location according to place entered on event create
 		var GetMapLocation = {
 			MapLocationBit : true
@@ -257,7 +242,7 @@ var mainFunction = (function()
 
 	$("document").ready(function(){
 		webURL = serverURL(); // server url
-		GetEventProperties();
+		EventInfo();
 		$(document).on("click", "#endEvent", function(){ // log out from app
 			event.preventDefault();
 			var answer = confirm("אתה בטוח שאתה רוצה לסיים את האירוע?");

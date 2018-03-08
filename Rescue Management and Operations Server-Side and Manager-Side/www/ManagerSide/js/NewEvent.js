@@ -23,7 +23,7 @@ var mainFunction = (function()
 		{
 			myresponse = myresponse.replace('success','');
 			alert(myresponse);
-			window.location.href = "ActiveEvent.html";
+			window.location.href = "JoinEvent.html";
 		}
 		else if(!isNaN(myresponse))
 		{

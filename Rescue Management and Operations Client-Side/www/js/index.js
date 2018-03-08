@@ -3,7 +3,7 @@ var mainFunction = (function()
 	document.addEventListener("deviceready", onDeviceReady, false);
 	var ActiveSession; // the active session
 	var Events = null;
-	var webURL = "http://795c22a4.ngrok.io"; // server url
+	var webURL = "http://b36dc69b.ngrok.io"; // server url
 	var inEvent = false;
 	var bgGeo = null; // init inside getLocation()
 	var EventNum;
@@ -33,14 +33,43 @@ var mainFunction = (function()
 			response = response.replace('success','');
 			$('#LoginForm').hide();
 			ActiveSession = response;
-			var MySession = {session_id : ActiveSession}
-			ajaxRequest(MySession, webURL + "/show_events.php", checkExistingEvents);
+			var MySession = {session_id : ActiveSession};
+			ajaxRequest(MySession, webURL + "/rejoin_event.php", connectedToEvent);
 		}
 		else
 		{
 			alert(response);
 		}
 	}
+	
+	function connectedToEvent(response)
+	{
+		if(typeof response === 'string')
+		{
+			response = response.trim();
+			response = response.replace(/['"]+/g, '');
+			if(response == "failed")
+			{
+				var MySession = {session_id : ActiveSession};
+				ajaxRequest(MySession, webURL + "/show_events.php", checkExistingEvents);
+			}
+			else
+			{
+				alert(response);
+			}
+		}
+		else
+		{
+			$('.collapse').collapse('hide');
+			$("#NavigationBar").show();
+			ChosenEvent["event_id"] = response["event_id"];
+			ChosenEvent["event_name"] = response["event_name"];
+			ChosenEvent["event_location"] = response["place"];
+			ChosenEvent["event_description"] =  response["description"];
+			joinEvent(response["event_id"]);
+		}
+	}
+	
 	
 	function checkExistingEvents(response) // Check for string error or events object
 	{
@@ -148,13 +177,13 @@ var mainFunction = (function()
 		$('.nav li.EndEvent').removeClass('disabled');
 		$('.nav li.LogOut').addClass('disabled');
 		$('.nav li.TryAgain').addClass('disabled');
-		//getLocation();
+		getLocation();
 	}
 	
 	function getImages() // Get images from the server related to the event
 	{ 
-		var MySession1 = {session_id : ActiveSession};
-		ajaxRequest(MySession1, webURL + "/img_download.php", imageResult);
+		var MyImages = {session_id : ActiveSession};
+		ajaxRequest(MyImages, webURL + "/img_download.php", imageResult);
 	}
 	
 	function imageResult(response) // show the images on the event page
@@ -164,6 +193,11 @@ var mainFunction = (function()
 			response = response.trim();
 			response = response.replace(/\\\//g, "/");
 			imageArr = JSON.parse(response);
+			for(var i = 0; i < imageArr.length; i++)
+			{
+				imageArr[i] = imageArr[i].replace("/wamp64/www", "");
+				imageArr[i] = webURL + imageArr[i];
+			}
 			currentImage = imageArr[0];
 			document.getElementById("eventPicture").src = currentImage;
 		}
@@ -247,8 +281,8 @@ var mainFunction = (function()
 		var speed = coords.speed;
 		bgGeo.finish(taskId);
 		// testing:
-		document.getElementById("userLocation").innerHTML = "";
-		document.getElementById("userLocation").innerHTML = "lat: " + latitude + ", lon: " + longitude + ", time: " + timestamp;
+		//document.getElementById("userLocation").innerHTML = "";
+		//document.getElementById("userLocation").innerHTML = "lat: " + latitude + ", lon: " + longitude + ", time: " + timestamp;
 	}
 		
 	function failureFn(errorCode) // location retrived failure
@@ -311,7 +345,7 @@ var mainFunction = (function()
 		document.addEventListener("pause", onPause, false);
 		document.addEventListener("resume", onResume, false);
 		document.addEventListener("menubutton", onMenuKeyDown, false);
-		document.addEventListener("backbutton", onMenuKeyDown, false);
+		document.addEventListener("backbutton", onBackKeyDown, false);
 	}
 		
 	function onPause()
@@ -327,6 +361,11 @@ var mainFunction = (function()
 			$("#ActiveEventDiv").show();
 			showEvent();
 		}
+	}
+	
+	function onMenuKeyDown() // Ignore the back button
+	{ 
+		
 	}
 	
 	function onBackKeyDown() // Ignore the back button

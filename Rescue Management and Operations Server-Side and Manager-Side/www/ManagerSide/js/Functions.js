@@ -23,7 +23,7 @@ function ajaxRequest(SendObject, serverPage, myfunction, contentType, processDat
 }
 
 function serverURL(){
-	var url = "http://795c22a4.ngrok.io";
+	var url = "http://b36dc69b.ngrok.io";
 	return url;
 	
 }

@@ -2,8 +2,6 @@
 
 // This page handles the logout from the system on both sides
 
-
-// *** Include files and headers *** //
 include 'data_operations.php';
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Max-Age: 1728000');
@@ -12,8 +10,8 @@ header('Access-Control-Allow-Headers:  Content-Type, *');
 header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json; charset=iso-8859-1');
 
-$logout = false; // Bit form manager
-$logout1 = false; // Bit from client
+$logout_client = false; // Bit form manager
+$logout_manager = false; // Bit from client
 
 // If the user session ID is set
 if(isset($_POST['session_id']))
@@ -21,17 +19,17 @@ if(isset($_POST['session_id']))
 	// Set the user session ID
 	session_id($_POST['session_id']);
 	
-	$logout1 = true;
+	$logout_client = true;
 }
 else if(isset($_POST['logout']))
 {
 	// Set the user session ID
-	$logout = $_POST['logout'];
+	$logout_manager = $_POST['logout'];
 }
 
 include 'head.php';
 
-if($logout || $logout1)
+if($logout_client || $logout_manager)
 {
 	// Get the session user id
 	$user_id = read_from_session('session_user_id');

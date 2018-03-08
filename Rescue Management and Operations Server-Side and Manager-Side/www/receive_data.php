@@ -7,11 +7,14 @@ header('Access-Control-Allow-Credentials: true');
 // Get the location array from the client with the session id
 $data = json_decode(file_get_contents("php://input"),true);
 
-// Get the session from the array
-$session_id = $data['session_id'];
+if(isset($_POST['session_id']))
+{
+	// Get the session from the array
+	$session_id = $data['session_id'];
 
-// set the current session as the one to work with
-session_id($session_id);
+	// set the current session as the one to work with
+	session_id($session_id);
+}
 
 include 'head.php';
 include 'data_operations.php';
@@ -23,19 +26,34 @@ $ev = read_from_session('event_id');
 $event_id= '__'.$ev;
 
 // Read the user id from the current session
-$us = read_from_session('user_id');
+$us = read_from_session('session_user_id');
 
 // Phrase the user id for the database
 $user_id = '__'.$us;
 
-// Get the username from the current session
-$user_name = read_from_session('username');
+// The user name sql query
+$user_name_command_text = "SELECT user_name
+						   FROM users
+						   WHERE user_id='$us'";
 
-// Initialize an array for the check signed user column names
-$active_users_in_event_column_names_array = array("user_id");
+// Initialize an array for the user name column names
+$user_name_column_names_array = array("user_name");
+								
+// The user name retrived data array
+$user_name_array = retrive_sql_data($user_name_command_text, $user_name_column_names_array);
+
+// If the user name has been found
+if(count($user_name_array) > 0)
+{
+	// Set the user name object that was found in the retrived data array
+	$user_name_object = $user_name_array[0];
+
+	// Set the user name
+	$user_name = $user_name_object['user_name'];
+}
 
 // Insert all locations to the user table
-$insert_locations_command_text = "INSERT INTO event$event_id$user_id (user_name,latitude,longitude,timestamp) VALUES ";		
+$insert_locations_command_text = "INSERT INTO event$event_id$user_id			(user_name,latitude,longitude,timestamp) VALUES ";		
 
 // array that iclude all the recent locations from the user
 $location_value_arr = array();
@@ -65,7 +83,7 @@ $insert_locations_command_text .= implode(", ", $location_value_arr);
 file_put_contents('text1.txt', var_export($insert_locations_command_text, TRUE));
 
 // Execute the location insert to the database
-$response_id_arr = $execute_sql_command($insert_locations_command_text);
+$response_id_arr = execute_sql_command($insert_locations_command_text);
 
 // Check if the user locations table exist
 if($response_id_arr[1])

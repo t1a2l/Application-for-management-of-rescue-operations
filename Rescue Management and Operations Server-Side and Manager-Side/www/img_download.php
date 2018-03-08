@@ -22,4 +22,5 @@ $image_arr = download_file($event_id);
 // send the array to the user
 echo json_encode($image_arr);
 
+
 ?>

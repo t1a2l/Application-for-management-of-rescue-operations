@@ -1,11 +1,11 @@
 <?php 
-	
+	// Get the locations list from the excel file to pinpoint the event location
 	include 'head.php';
 	include 'data_operations.php';
 	header('Access-Control-Allow-Origin: *');
 	header('Content-Type: text/html; charset=utf-8');
 	
-	require '../apps/phpsysinfo3.2.5/vendor/autoload.php';
+	require '../apps/phpsysinfo3.2.7/vendor/autoload.php';
 	
 	use PhpOffice\PhpSpreadsheet\Spreadsheet;
 	use PhpOffice\PhpSpreadsheet\Reader\Xlsx;

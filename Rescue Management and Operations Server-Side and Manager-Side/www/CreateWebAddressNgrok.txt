@@ -1,2 +1,10 @@
-e734e372
 ngrok http -host-header=index.php 80
+
+
+
+SELECT table_name 
+FROM information_schema.tables, events 
+WHERE table_schema='rmo_database' 
+	AND TABLE_NAME like 'event__55__7'
+	AND events.e_time IS NULL
+	AND events.event_id = '55';
