@@ -1,6 +1,6 @@
 <?php
 
-// The client rejoin an event he is part of already
+// The client rejoin an event he is already part of
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Credentials: true');
@@ -18,11 +18,13 @@ else
 include 'head.php';
 include 'data_operations.php';
 
+// Get user id from session
 $user_id = read_from_session('session_user_id');
 
-// Get user id from the event the user joined
+// Get the event id from the users table that match the current user
 $event_id_command_text = "SELECT event_id
-						 FROM events";
+						  FROM users
+						  WHERE user_id = '$user_id'";
 
 // Initialize an array for the user id column names
 $event_id_column_names_array = array("event_id");
@@ -33,70 +35,39 @@ $event_id_array = retrive_sql_data($event_id_command_text, $event_id_column_name
 // event id array length
 $event_id_arr_length = count($event_id_array);
 
-// If a table of the current user has been found
-$found = false;
+// The event id from the event id array
+$event_id = $event_id_array["event_id"];
 
-for($index = 0; $index < $event_id_arr_length; $index++)
+// Check if the current user is part of an event
+if($event_id != 0)
 {
-	// The event id from the event id array
-	$event_id = $event_id_array[$index]["event_id"];
-	
-	// Phrase the table name for the database
-	$table_name = 'event__'.$event_id.'__'.$user_id;
-	
-	// Initialize an array for the existing table name check
-	$active_event_id_column_names_array = array("table_name");
-	
-	// Query for the table with the current event id and user id existing check
-	$active_event_id_command_text = "SELECT table_name 
-									 FROM information_schema.tables, events 
-									 WHERE table_schema='rmo_database' 
-										   AND TABLE_NAME like '$table_name'
-										   AND events.e_time IS NULL
-										   AND events.event_id = '$event_id'";
-	
-	// Check if the a table with the current event id and user id exist
-	$active_table_name_retrived_data_array = retrive_sql_data($active_event_id_command_text, $active_event_id_column_names_array);							
-	
-	// Check if the table exist by size of the array
-	$active_table_name_arr_length = count($active_table_name_retrived_data_array);
-	
-	// If table exist in database set found to true and return the event id
-	if($active_table_name_arr_length == 1)
-	{
-		$found = true;
-		
-		$event_info_command_text = "SELECT * 
-									FROM events
-									WHERE event_id='$event_id'";
+	$event_info_command_text = "SELECT * 
+								FROM events
+								WHERE event_id = '$event_id'";
 
-		// Initialize an array for the events column names
-		$event_info_array = array('event_id', 'event_name', 'description', 'place');
-									
-		// Set the events retrived data array
-		$event_info_retrived_data_array = retrive_sql_data($event_info_command_text, $event_info_array);							
-		
-		// Check if the table exist by size of the array
-		$event_info_arr_length = count($event_info_retrived_data_array);
-		
-		if($event_info_arr_length > 0)
-		{
-			$event_info_object = $event_info_retrived_data_array[0];
-			echo json_encode($event_info_object);
-		}
-		else
-		{
-			echo json_encode("failed");
-		}
+	// Initialize an array for the events column names
+	$event_info_array = array('event_id', 'event_name', 'description', 'place');
+								
+	// Set the events retrived data array
+	$event_info_retrived_data_array = retrive_sql_data($event_info_command_text, $event_info_array);					
+	
+	// The event array length
+	$event_info_arr_length = count($event_info_retrived_data_array);
+	
+	// If the event exists
+	if($event_info_arr_length > 0)
+	{
+		$event_info_object = $event_info_retrived_data_array[0];
+		echo json_encode($event_info_object);
+	}
+	else
+	{
+		echo json_encode("failed");
 	}
 }
-// If no table found that match to the current user id
-if($found == false)
+else
 {
 	echo json_encode("failed");
 }
-
-
-    
 
 ?>

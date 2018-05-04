@@ -19,88 +19,84 @@ include 'data_operations.php';
 if(isset($_POST['event_id']))
 {
 	// The event id from the client
-	$ev = $_POST["event_id"];
-	
-	// The event id phrasing in the database
-	$event_id = '__'.$ev;
+	$event_id = $_POST["event_id"];
 	
 	// Write the event id to the active session of the client
-	write_to_session('event_id',$ev);
+	write_to_session('event_id',$event_id);
 	
 	// The user id from the session
-	$us = read_from_session('session_user_id');
+	$user_id = read_from_session('session_user_id');
 	
-	// The user id phrasing in the database
-	$user_id = '__'.$us;
-
-	// Get user id from the event the user joined
-	$user_id_command_text = "SELECT user_id
-							 FROM event$event_id
-							 WHERE user_id = '$us'";
-
-	// Initialize an array for the user id column names
-	$user_id_column_names_array = array("user_id");
+	// Get The event id from the users table according to the user id
+	$user_name_event_id_command_text = "SELECT event_id
+										FROM users 
+										WHERE user_id = '$user_id'";
+	
+	// Initialize an array for the event id column names
+	$user_event_id_column_names_array = array("event_id");
 									
-	// user id retrived data array
-	$user_id_retrived_data_array = retrive_sql_data($user_id_command_text, $user_id_column_names_array);
+	// The event id retrived data array
+	$user_event_id_retrived_data_array = retrive_sql_data($user_event_id_command_text, $user_event_id_column_names_array);
 
-	// Get the length of the user id retrived data array
-	$user_id_arr_length = count($user_id_retrived_data_array);
-
-	// check if the user id is registered in the event
-	if($user_id_arr_length == 0)
-	{
-		// insert the user id to the event table command
-		$insert_user_id_command_text = "INSERT INTO event$event_id (`user_id`) 
-										VALUES ($us)";
-		// insert the user id execute
-		$result = execute_sql_command($insert_user_id_command_text);
+	// Get the length of the event id retrived data array
+	$user_event_id_arr_length = count($user_event_id_retrived_data_array);	
+	
+	// Set the table name
+	$table_name = "locations";
+	
+	// Check if the table exist already in the database
+	$locations_table_check_arr_length = tableExist($table_name);
 		
-		if($result[1] == false)
-		{
-			echo json_encode("הוספת משתמש לאירוע נכשלה");
-			exit();
-		}
-	}
-	
-	// Get id of user to check if the locations table is empty
-	$id_command_text = "SELECT id
-					    FROM event$event_id$user_id";
-						
-	// Check if the user locations table exist
-	$response_id_arr = execute_sql_command($id_command_text);	
-	
-	// If the location table don't exist
-	if($response_id_arr[1] == false)
+	// If the locations table don't exist
+	if($locations_table_check_arr_length == 0)
 	{
-		$create_user_location_table_command_text = "CREATE TABLE `rmo_database`.`event$event_id$user_id`
-												   ( `id` INT(30) NOT NULL AUTO_INCREMENT,
-													 `user_name` VARCHAR(20) NOT NULL ,
+		$create_locations_table_command_text = "CREATE TABLE `rmo_database`.`locations`
+												   ( `location_id` INT(30) NOT NULL AUTO_INCREMENT,
+													 `user_id` VARCHAR(30) NOT NULL ,
+													 `user_name` VARCHAR(30) NOT NULL ,
+													 `event_id` INT(30) NOT NULL ,
 													 `latitude` VARCHAR(50) NOT NULL ,
 													 `longitude` VARCHAR(50) NOT NULL ,
 													 `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-													 PRIMARY KEY (`id`)
+													 `found_point` tinyint(1) NOT NULL ,
+													 PRIMARY KEY (`location_id`)
 												   ) ENGINE = MyISAM";
 		
 		// Check if the user locations table has been created succesfully
-		$response_table_arr = execute_sql_command($create_user_location_table_command_text);
+		$response_table_arr = execute_sql_command($create_locations_table_command_text);
 		
 		
 		// If unable to create table
 		if($response_table_arr[1] == false)
 		{
-			echo json_encode("נכשל ביצירת טבלת משתמש אירוע חדשה");
+			echo json_encode("נכשל ביצירת טבלת המיקומים");
+			exit();
 		}
-		// If table creation was succesfull
+	}
+	
+	if($user_event_id_arr_length > 0)
+	{
+		echo json_encode("success אתה כבר חלק מהאירוע");
+	}
+	else
+	{
+		// Update the users table with the event id
+		$insert_event_id_command_text = "UPDATE Users
+									     SET event_id = '$event_id'
+									     WHERE user_id = '$user_id'";
+		// Execute the query
+		$result = execute_sql_command($insert_event_id_command_text);
+		
+		// Check if the query succesfully updated the table
+		if($result[1] == false)
+		{
+			echo json_encode("הוספת משתמש לאירוע נכשלה");
+			exit();
+		}
 		else
 		{
 			echo json_encode("success הצטרפת לאירוע");
 		}
-	}
-	// If table already exist
-	else
-	{
-		echo json_encode("success אתה כבר חלק מהאירוע");
 	}
 }
 else

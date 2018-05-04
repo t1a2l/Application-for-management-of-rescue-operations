@@ -4,11 +4,12 @@ var mainFunction = (function()
 	var TimeStampLocationValue = 0; // Default no location sent before
 	var lastPointArr = []; // Array that save the lastest points 
 	var mymap; // The map object
+	var marker; // The marker object
 	var locationInterval; // send location evry minute or so
 	var AreaColor = "black"; // color of the search areas
 	var AreaNum = 0;
 	var event_id;
-	var Markers = [];
+	var MarkersColor = [];
 	var blackFoundIcon; // found marker
 	var loader; // Page loading
 	
@@ -81,7 +82,7 @@ var mainFunction = (function()
 						L.Toolbar2.Action.extendOptions({
 							toolbarIcon: { 
 								className: 'leaflet-control-button', 
-								html: '' // Text Box
+								html: ''
 							}, 
 							subToolbar: new L.Toolbar2({ actions: [
 								L.ShapeTitle.extendOptions({title: ShapeTitle.getContent()})
@@ -184,116 +185,64 @@ var mainFunction = (function()
 	function ShowMarkersOnMap(response){ // Display a polyline of user walking pattren
 		response = response.trim();
 		response = JSON.parse(response);
-		if(!response)
+		var numOfUsers = response.length;
+		var userLocationObject;
+		var iconIndex = 0;
+		for(var i = 0; i < numOfUsers; i++) // Number of users in the event
 		{
-			alert("אין מיקומים חדשים");
-		}
-		else
-		{
-			var usersLocationArr = response[0];
-			var usersInfoArr = response[1];
-			var numOfUsers = usersLocationArr.length;
-			var userLocationObject;
-			var iconIndex = 0;
-			var polyline; // User path
-			var marker; // Current user location
-			var pathColor; // Current user path color
-			var usersColorArr = [];
-			var index = 1;
-			if(Markers.length != 0)
+			numOfUserLocation = response[i].length;
+			var latlngs = [];
+			for(var j = 0; j < numOfUserLocation; j++) // Number of location per user
 			{
-				for(var s = 0; s < Markers.length; s++)
+				userLocationObject = response[i][j];
+				
+				if(lastPointArr.length > 0 && j == 0) // Connect the last point with the new point
 				{
-					mymap.removeLayer(Markers[s]);
+					mymap.removeLayer(marker);
+					var lastPoint = [];
+					lastPoint[0] = lastPointArr[userLocationObject['user_name']].lastPoint;
+					lastPoint[1] = [userLocationObject['latitude'], userLocationObject['longitude']];
+					var polyline = L.polyline(lastPoint, {color: getRandomColor()}).addTo(mymap);
 				}
-			}
-			for(var i = 0; i < numOfUsers; i++) // Number of users in the event
-			{
-				numOfUserLocation = usersLocationArr[i].length;
-				var latlngs = [];
-				for(var j = 0; j < numOfUserLocation; j++) // Number of location per user
+								
+				latlngs[j] = [userLocationObject['latitude'], userLocationObject['longitude']];
+								
+				if(j == numOfUserLocation - 1) // Take the last point and save it to connect to the first point of the next batch
 				{
-					userLocationObject = usersLocationArr[i][j];
-					latlngs[j] = [userLocationObject['latitude'], userLocationObject['longitude']];
-									
-					if(j == numOfUserLocation - 1) // Take the last point and save it to connect to the first point of the next batch
+					var username = userLocationObject['user_name'];
+					lastPointArr[username] = [];
+					lastPointArr[username]['lastPoint'] = latlngs[j];
+					var polyline = L.polyline(latlngs, {color: getRandomColor()}).addTo(mymap);
+					if(i == MarkersColor.length - 1) // Reset the marker array when all markers are used
 					{
-						for(var t = 0; t < usersInfoArr.length; t++)
-						{
-							if(usersInfoArr[t]['user_name'] == userLocationObject['user_name'])
-							{
-								pathColor = usersInfoArr[t]['color'];
-								break;
-							}
-						}
-										
-						if(!pathColor) // check for a the path color
-						{
-							pathColor = getRandomColor();
-							usersColorArr[index] = {};
-							usersColorArr[index].username = userLocationObject['user_name'];
-							usersColorArr[index].color = pathColor;
-							index++;
-						}
-						
-						rgbColor = HexToRgb(pathColor); // get the marker color in rgb
-						polyline = L.polyline(latlngs, {color: pathColor}).addTo(mymap); // add the path to the map
-						marker = new L.Marker.SVGMarker([userLocationObject['latitude'], userLocationObject['longitude']], { iconOptions: { color: rgbColor }}).addTo(mymap);
-						Markers.push(marker);
+						iconIndex = 0;
 					}
-					
-					if(parseInt(userLocationObject['found_point'])) // Check for found person and put marker on the map
+					else
 					{
-						foundMarker = L.marker([userLocationObject['latitude'], userLocationObject['longitude']], { iconOptions: { color: 'rgb(0,0,0)' }}).addTo(mymap);
+						marker = L.marker([userLocationObject['latitude'], userLocationObject['longitude']], {icon: MarkersColor[iconIndex]}).addTo(mymap);
+						iconIndex++;
 					}
 				}
-			}
-			if(userLocationObject) // Set the time stamp for the next batch of locations to add to the path
-			{
-				TimeStampLocationValue = userLocationObject['timestamp'];
-			}
-			if(usersColorArr.length > 0) // Send color attached to new users
-			{
-				usersColorArr[0] = {};
-				usersColorArr[0].event_id = event_id;
-				var usersColorsObject = {
-					usersColors : usersColorArr
-				};
-				var SendcurrentUsersColors = {currentUsersColors : usersColorsObject};
-				ajaxRequest(SendcurrentUsersColors, webURL + "/set_users_colors.php", usersColorsFunc);
+				
+				if(parseInt(userLocationObject['found_point'])) // Check for found person and put marker on the map
+				{
+					foundMarker = L.marker([userLocationObject['latitude'], userLocationObject['longitude']], {icon: blackFoundIcon}).addTo(mymap);
+				}
 			}
 		}
-	}
-	
-	function usersColorsFunc(response){
-		response = response.trim();
-		response = response.replace(/['"]+/g, '');
-		if(response != "success")
+		if(userLocationObject)
 		{
-			alert("error saving new colors");
-		}	
+			TimeStampLocationValue = userLocationObject['timestamp'];
+		}
 	}
 	
 	function getRandomColor() { // Get a random color for the line of the pathway of the client
 		var letters = '0123456789ABCDEF';
 		var color = '#';
-		for(var i = 0; i < 6; i++) {
-			color += letters[Math.floor(Math.random() * 16)];
-		}
-		while(color == '#000000' || color == '#FFFFFF')
-		{
-			return getRandomColor();
+		for (var i = 0; i < 6; i++) {
+		color += letters[Math.floor(Math.random() * 16)];
 		}
 		return color;
-	}
-	
-	function HexToRgb(hex){
-		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		return result ? {
-			r: parseInt(result[1], 16),
-			g: parseInt(result[2], 16),
-			b: parseInt(result[3], 16)
-		} : null;
 	}
 		
 	function EventEnd(){ // Finish the event request
@@ -316,12 +265,94 @@ var mainFunction = (function()
 		}
 	}
 	
-	
+	function setMarkers(){
+		var greenIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		MarkersColor.push(greenIcon);
+		
+		var blueIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		MarkersColor.push(blueIcon);
+		
+		var redIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		MarkersColor.push(redIcon);
+		
+		var orangeIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		MarkersColor.push(orangeIcon);
+		
+		var yellowIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		MarkersColor.push(yellowIcon);
+		
+		var violetIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		MarkersColor.push(violetIcon);
+		
+		var greyIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		MarkersColor.push(greyIcon);
+		
+		blackFoundIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-black.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+
+	}
+
 	$("document").ready(function(){
 		loader = document.getElementById("eventLoader");
 		loader.style.display = "block";
 		webURL = serverURL(); // server url
 		EventInfo();
+		setMarkers();
 		$(document).on("click", "#endEvent", function(){ // log out from app
 			event.preventDefault();
 			var answer = confirm("אתה בטוח שאתה רוצה לסיים את האירוע?");

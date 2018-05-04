@@ -19,14 +19,14 @@ if(isset($_POST['userLoginDetails']))
 	$user_login_details = $_POST['userLoginDetails'];
 
 	// Set the typed EMail parameter ...
-	$username = $user_login_details['username'];
+	$user_name = $user_login_details['username'];
 	// Set the typed password parameter ...
 	$password = $user_login_details['password'];
 
 	$entrance_type = $user_login_details['source'];
 
 	// Check that all the required fields are not empty ...
-	foreach(array($username, $password) as $user_login_details_property)
+	foreach(array($user_name, $password) as $user_login_details_property)
 	{
 		// If one or more of the required fields is empty ...
 		if(empty($user_login_details_property))
@@ -41,7 +41,7 @@ if(isset($_POST['userLoginDetails']))
 	// Set the check signed user command text
 	$check_signed_user_command_text = "SELECT U.user_id, U.permissions
 									   FROM users U
-									   WHERE U.username = '$username' AND U.password = '$password'";
+									   WHERE U.user_name = '$user_name' AND U.password = '$password'";
 
 	// Initialize an array for the check signed user column names
 	$check_signed_user_column_names_array = array("user_id", "permissions");

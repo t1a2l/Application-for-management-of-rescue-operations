@@ -4,6 +4,7 @@ var mainFunction = (function()
 	var Events = [];
 	var ChosenEvent = [];
 	var myEvent = new Object();
+	var loader;
 	
 	function GetEventProperties(){ // Event properties request from server
 		var GetEventData = {
@@ -17,6 +18,7 @@ var mainFunction = (function()
 		if(typeof response === 'string')
 		{
 			alert("אין אירועים פעילים");
+			loader.style.display = "none";
 			window.location.href = "MainPage.html";
 		}
 		else
@@ -37,6 +39,7 @@ var mainFunction = (function()
 	
 	function showEvents(response) // Show events by this managar
 	{
+		loader.style.display = "none";
 		$("#Events").html('');
 		Events = response;
 		document.getElementById("eventChoose").InnerHTML = "בחר אחד מהאירועים הבאים:"
@@ -93,8 +96,10 @@ var mainFunction = (function()
 		localStorage.setItem("ChosenEvent", JSON.stringify(ChosenEvent));
 		window.location.href = "ActiveEvent.html";
 	}
-	
+		
 	$("document").ready(function(){
+		loader = document.getElementById("eventsLoader");
+		loader.style.display = "block";
 		webURL = serverURL(); // server url
 		GetEventProperties();
 		$(document).on("click", ".list-group-item", function(){ // Choose the event to manage

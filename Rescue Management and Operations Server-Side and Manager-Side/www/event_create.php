@@ -56,23 +56,11 @@ if($response_arr[1])
 	// Write the event id to the current session
 	write_to_session('event_id',$event_id);	
 
-	// Create event table user ids
-	while(!EventTableUserId($event_id))
-	{
-		// Check that connection to database is ok
-		if (!mysql_ping()) 
-		{
-			// If no connection to database close connection and send event id
-			mysql_close();
-			echo json_encode($event_id);
-		}
-	}
-	
 	//Run notifications to send sms to users
 	// include 'notifications.php';
 	
 	// Create directory for pictures and change permissions to allow access to pictures of the event
-	mkdir("/wamp/www/img/$event_id", 0777, true);
+	mkdir("/wamp64/www/img/$event_id", 0777, true);
 	
 	$echoResult = "";
 	
@@ -83,7 +71,7 @@ if($response_arr[1])
 		if(!upload_file($event_id, $event_lost_picture))
 		{
 			// Notify the user about uploading failure
-			$echoResult = "האירוע נוצר בהצלחה אל העלאת התמונה נכשלה";
+			$echoResult = "האירוע נוצר בהצלחה אך העלאת התמונה נכשלה";
 		}
 		else
 		{

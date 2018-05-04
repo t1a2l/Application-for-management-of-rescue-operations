@@ -8,3 +8,11 @@ WHERE table_schema='rmo_database'
 	AND TABLE_NAME like 'event__55__7'
 	AND events.e_time IS NULL
 	AND events.event_id = '55';
+
+
+
+$_POST['myParams']
+
+
+
+http://1677c44c.ngrok.io/ManagerSide/ActiveEvent.html

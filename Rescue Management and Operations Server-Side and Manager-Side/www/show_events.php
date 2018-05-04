@@ -20,8 +20,9 @@ $user_id = read_from_session('session_user_id');
 if(isset($_SESSION['session_user_id']) && $_SESSION['session_user_id'] == $user_id)
 {
 	//Getting all the events
-	$events_command_text = "SELECT * 
-							FROM events";
+	$events_command_text = "SELECT *
+							FROM events
+							WHERE e_time IS NULL";
 
 	// Initialize an array for the events column names
 	$events_names_array = array('event_id', 'event_name', 'description', 'place');

@@ -2,7 +2,6 @@
 
 // This page has all the general functions used by the diffrent pages
 
-
 // Connect to SQL server database
 function connect_to_database()
 {
@@ -154,31 +153,55 @@ function download_file($event_id)
 		return $image_arr;
 }
 
-
-function EventTableUserId($event_id)
+// *** Connect the last point of the previous batch to the current set of points to connect the path *** //
+// *** Parameters: the event id, the user name *** //
+function connectPoints($event_id, $user_name, $time_stamp)
 {
-		// Creating a table of all user ids related to the event that was created query		
-		$create_event_table = "CREATE TABLE `rmo_database`.`event__$event_id` 
-							   ( `user_id` VARCHAR(30) NOT NULL ) ENGINE = MyISAM";
+	// The query to get the last point of the previous batch
+	$previous_batch_last_point_command_text = "SELECT *
+											   FROM locations
+											   WHERE event_id = '$event_id' AND
+													 location_id = ( SELECT max(location_id)
+																	 FROM locations
+																	 WHERE user_name = '$user_name' AND
+																		   event_id = '$event_id' AND 
+																		   timestamp <= '$time_stamp' )";
+					
+	// Initialize an array for the  last point of the previous batch of all users column names
+	$previous_batch_last_point_column_names_array = array("location_id", "user_id", "user_name", "event_id", "latitude", "longitude", "timestamp", "found_point");
 
-		// query execution
-		$response = execute_sql_command($create_event_table);
-
-		// if the user ids table was created successfully
-		return $response[1];
+	// Get the last point of the previous batch retrived data array
+	$previous_batch_last_point_retrived_data_array = retrive_sql_data($previous_batch_last_point_command_text, $previous_batch_last_point_column_names_array);
+	
+	// The array length of the last point of the previous batch
+	$previous_batch_last_point_arr_length = count($previous_batch_last_point_retrived_data_array);
+	
+	// If there is a last point return it
+	if($previous_batch_last_point_arr_length > 0)
+	{
+		return $previous_batch_last_point_retrived_data_array[0];
+	}
+	else
+	{
+		return 0;
+	}
 }
 
-function DeleteEvent($event_id)
+// *** Check if a certain table exists in the database *** //
+// *** Parameters: the table name *** //
+function tableExist($table_name)
 {
-		// Creating a table of all user ids related to the event that was created query		
-		$create_event_table = "CREATE TABLE `rmo_database`.`event__$event_id` 
-							   ( `user_id` VARCHAR(30) NOT NULL ) ENGINE = MyISAM";
+	// Command text
+	$locations_table_check_command_text = "SHOW TABLES LIKE '$table_name'";
+	
+	// Initialize an array for the locations table column name
+	$locations_table_check_command_text_column_names_array = array("Tables_in_rmo_database(".$table_name.")");
 
-		// query execution
-		$response = execute_sql_command($create_event_table);
-
-		// if the user ids table was created successfully
-		return $response[1];
+	// Get an array that has the table name in it if it exists
+	$locations_table_check_retrived_data_array = retrive_sql_data($locations_table_check_command_text, $locations_table_check_command_text_column_names_array);
+	
+	// Return the array length, if it is greater then zero it means the table exists
+	return count($locations_table_check_retrived_data_array);
 }
 
 ?>

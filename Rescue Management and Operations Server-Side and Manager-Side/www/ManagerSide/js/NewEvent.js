@@ -1,19 +1,11 @@
 var mainFunction = (function()
 {
 	var webURL; // server url
-	var deleteInterval;
 	var LocationsArr;
 	
 	function NewEventForm(){ // send login info to server and recieve a session to work with
-		if(typeof deleteInterval == 'undefined')
-		{
-			var formData = new FormData($('#NewEventForm')[0]);
-			ajaxRequest(formData, webURL + "/event_create.php", NewEventFormResult, false, false);
-		}
-		else
-		{
-			alert("המערכת מבצעת מחיקת אירוע...");
-		}
+		var formData = new FormData($('#NewEventForm')[0]);
+		ajaxRequest(formData, webURL + "/event_create.php", NewEventFormResult, false, false);
 	}
 	
 	function NewEventFormResult(response){ // Get user info to show the appopriate home screen
@@ -25,22 +17,11 @@ var mainFunction = (function()
 			alert(myresponse);
 			window.location.href = "JoinEvent.html";
 		}
-		else if(!isNaN(myresponse))
+		else
 		{
-			alert("החיבור לבסיס הנתונים נכשל");
-			var interval = 1000 * 30; // where X is your every X minutes
-			var deleteTable = {event_id : myresponse};
-			deleteInterval = setInterval(ajaxRequest, interval, deleteTable, webURL + "/event_delete.php", DeleteResult);
+			alert(myresponse);
 		}
 		
-	}
-	
-	function DeleteResult(response){
-		if(response)
-		{
-			clearInterval(deleteInterval);
-			deleteInterval = undefined;
-		}
 	}
 	
 	function GetLocations(){

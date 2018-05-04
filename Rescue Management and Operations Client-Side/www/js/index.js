@@ -2,15 +2,15 @@ var mainFunction = (function()
 {
 	document.addEventListener("deviceready", onDeviceReady, false);
 	var ActiveSession; // the active session
-	var Events = null;
-	var webURL = "http://b36dc69b.ngrok.io"; // server url
+	var Events = null; // Events to show in the choose event screen
+	var webURL = "http://1677c44c.ngrok.io"; // Server URL
 	var inEvent = false;
-	var bgGeo = null; // init inside getLocation()
-	var EventNum;
-	var ChosenEvent = [];
-	var imageArr = [];
-	var currentImage;
-	var BackGroundColorArr = [];
+	var bgGeo; // init inside getLocation()
+	var ChosenEvent = []; // Array that holds the chosen event properties
+	var imageArr = []; // Array that holds all images of the lost perosn
+	var currentImage; // The active image the is showen in the active event page currrently
+	var BackGroundColorArr = []; // Color array to background of the events to choose from
+	var foundPoint = 0; // Person was found bit
 	
 	function SubForm() // Send login info to server and recieve a session to work with
 	{ 
@@ -217,10 +217,16 @@ var mainFunction = (function()
 		}
 		document.getElementById("eventPicture").src = currentImage;
 	}
+	
+	function TakePicture(){
+		navigator.getPicture(successCallback, errorCallback, options)
+		
+		
+	}
 		
 	function getLocation()
 	{
-		if(bgGeo == null)
+		if(!bgGeo)
 		{
 			bgGeo = window.BackgroundGeolocation;
 			bgGeo.configure({
@@ -229,17 +235,21 @@ var mainFunction = (function()
 				locationUpdateInterval: 15000,
 				fastestLocationUpdateInterval: 5000,
 				url: webURL + "/receive_data.php",
+				method: "POST",
 				headers:{
 					crossDomain: true,
 					beforeSend: function(xhr){
 						xhr.withCredentials = true;
 					}
 				},
-				httpRootProperty: 'data',
 				params:{
 					session_id : ActiveSession
 				},
+				httpRootProperty: 'data',
 				locationTemplate: '{"time":"<%= timestamp %>", "lat":<%= latitude %>, "lng":<%= longitude %>}',
+				extras: {
+					foundBit : foundPoint
+				},
 				batchSync: true,
 				maxBatchSize: 10,
 				httpTimeout: 20000,
@@ -261,25 +271,37 @@ var mainFunction = (function()
 		var status = response.status;
 		var responseText = response.responseText;
 		responseText = responseText.replace(/(\r\n|\n|\r)/gm,"");
-		var responseText = responseText.trim();
-		if(responseText == "Event ended")
-			EventEnd();
+		responseText = responseText.trim();
+		//alert(responseText);
+		if(foundPoint == 1)
+		{
+			foundPoint = 0;
+		}
+		if(responseText == "EventEnded")
+		{
+			alert("יצאת מהאירוע בהצלחה");
+			EventEndResult("success")
+		}
 	}
 	
 	function ajaxFailure(response) // ajax response failure
 	{ 
 		var status = response.status;
 		var responseText = response.responseText;
+		responseText = responseText.replace(/(\r\n|\n|\r)/gm,"");
+		responseText = responseText.trim();
+		alert(responseText);
 	}
 		
-	function successFn(location, taskId) // location retrived success
+	function successFn(location) // location retrived success
 	{ 
 		var coords = location.coords;
 		var timestamp = location.timestamp;
 		var latitude = coords.latitude;
 		var longitude = coords.longitude;
 		var speed = coords.speed;
-		bgGeo.finish(taskId);
+		var userLocation = "lat: " + latitude + ", lon: " + longitude + ", time: " + timestamp;
+		//alert(userLocation);
 		// testing:
 		//document.getElementById("userLocation").innerHTML = "";
 		//document.getElementById("userLocation").innerHTML = "lat: " + latitude + ", lon: " + longitude + ", time: " + timestamp;
@@ -290,30 +312,43 @@ var mainFunction = (function()
 		document.getElementById("userLocation").innerHTML = "location failure";
 		if(errorCode == 0) 
 		{
-		   navigator.notification.alert("Failed to retrieve location", alertDismissed);
+		   alert("Failed to retrieve location", alertDismissed);
 		}
 		else if(errorCode == 1) 
 		{
-		   navigator.notification.alert("You must enable location services in Settings", alertDismissed);
+		   alert("You must enable location services in Settings", alertDismissed);
 		}
 		else if(errorCode == 2) 
 		{
-		   navigator.notification.alert("Network error", alertDismissed);
+		   alert("Network error", alertDismissed);
 		}
 		else
-		   navigator.notification.alert("Location timeout", alertDismissed);
+		   alert("Location timeout", alertDismissed);
 	}
 	
-	function EventEnd(){ // Event ended by manager
-		bgGeo.stop();
-		ChosenEvent["event_id"]
-		$('.nav li.EndEvent').addClass('disabled');
-		$('.nav li.LogOut').removeClass('disabled');
-		$('.nav li.TryAgain').removeClass('disabled');
-		$("#ActiveEventDiv").hide();
-		$("#showLocation").hide();
-		$("#Events").show();
-		inEvent = false;
+	function EventEnd(){ // Event end - exit event
+		var endEvent = {session_id : ActiveSession};
+		ajaxRequest(endEvent, webURL + "/end_of_event.php", EventEndResult);
+	}
+	
+	function EventEndResult(resposne)
+	{
+		if(response == "Success")
+		{
+			alert("יצאת מהאירוע בהצלחה");
+			bgGeo.stop();
+			$('.nav li.EndEvent').addClass('disabled');
+			$('.nav li.LogOut').removeClass('disabled');
+			$('.nav li.TryAgain').removeClass('disabled');
+			$("#ActiveEventDiv").hide();
+			$("#showLocation").hide();
+			$("#Events").show();
+			inEvent = false;
+		}
+		else
+		{
+			alert("שגיאה בעזיבת האירוע");
+		}
 	}
 	
 	function LogOut() // Request to log out from app
@@ -359,7 +394,6 @@ var mainFunction = (function()
 		{
 			$("#Events").hide();
 			$("#ActiveEventDiv").show();
-			showEvent();
 		}
 	}
 	
@@ -426,6 +460,17 @@ var mainFunction = (function()
 			ChosenEvent["event_location"] = $(this).children()[2].textContent; 
 			ChosenEvent["event_description"] = $(this).children()[4].textContent; 
 			joinEvent(id);
+		});
+		
+		$(document).on("click", "#found", function(){ // Send found person coordinates
+			event.preventDefault();
+			foundPoint = 1;
+			document.getElementById("found").disabled = true;
+		});
+		
+		$(document).on("click", "#TakePic", function(){ // Take a picture and send it to the database
+			event.preventDefault();
+			TakePicture();
 		});
 
 	});	
