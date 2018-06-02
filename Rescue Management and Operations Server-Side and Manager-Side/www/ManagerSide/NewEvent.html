@@ -6,9 +6,10 @@
 		<link rel = "stylesheet" href = "css/external/bootstrap-rtl.css" />
 		<link rel="stylesheet" href="css/external/select2.min.css"  />
 		<link rel="stylesheet" href="css/NewEvent.css" />
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3-dr-MD9cMEU2kogoVyshvrxDP8O574Q&language=iw"></script>
 		<script src="js/external/jquery.js"></script>
 		<script src="js/external/jquery.form.js"></script>
-		<script src="js/external/bootstrap.min.js"></script>
+		<script src="js/external/bootstrap.js"></script>
 		<script src="js/external/select2.min.js"></script>
 		<script type="text/javascript" src="js/NewEvent.js"></script>
 		<script type="text/javascript" src="js/Functions.js"></script>
@@ -23,17 +24,27 @@
 						<form id="NewEventForm" class="NewEventFormStyle">
 							<div class="form-group">
 								<h4><label for="EventName" class="LabelStyle">שם האירוע:</label></h4>
-								<input type="text" class="form-control input-lg" id="EventNam" name="EventName" placeholder="שם האירוע" value="">
+								<input type="text" class="form-control input-lg" id="EventNam" name="EventName" placeholder="שם האירוע" value=""/>
 							</div>
 							<div class="form-group">
 								<h4><label for="EventLocation" class="LabelStyle">מיקום האירוע:</label></h4>
-								<div class="col-sm-10">
+								<div class="col-sm-2 selectCity">
+									<input type="radio" name="byType" value="City" checked/>
+								</div>
+								<div class="col-sm-8 selectCity">
 									<select class="form-control" id="EventLoc" name="EventLocation"></select>
-								</div>	
+								</div>
 								<div class="col-sm-2">
-									<button id="RefreshBtn" type="button" class="btn btn-primary RefreshBtnStyle">
-										<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-									</button>
+									<button id="RefreshBtn" type="button" class="btn btn-primary RefreshBtnStyle"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+								</div>
+								<div class="col-sm-3 selectCity">
+									<input type="radio" name="byType" value="Cords"/>
+								</div>
+								<div class="col-sm-7">
+									<label for="EventLocation" class="LabelStyle">בחר מהמפה:</label>
+								</div>
+								<div class="col-sm-2">
+									<button id="MapBtn" type="button" class="btn btn-primary MapBtnStyle"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span></button>
 								</div>
 							</div>
 							<div class="form-group">
@@ -42,12 +53,25 @@
 							</div>
 							<div class="form-group">
 								<h4><label for="EventLostPic" class="LabelStyle">תמונת הנעדר:</label></h4>
-								<input type="file" class="form-control input-lg" id="EventPic" name="EventLostPic">
+								<input type="file" class="form-control input-lg" id="EventPic" name="EventLostPic"/>
 								<p class="help-block help-style">הוסף את תמונת הנעדר</p>
 							</div>
 							<button id="EventCreateBtn" type="submit" class="btn btn-primary EventCreateBtnStyle" style="">צור אירוע</button>
 							<button id="BackBtn" type="button" class="btn btn-primary BackBtnStyle">חזרה</button>
 						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="mapModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header"></div>
+					<div class="modal-body">
+						<div id="map-canvas"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
 					</div>
 				</div>
 			</div>

@@ -15,15 +15,14 @@ function ajaxRequest(SendObject, serverPage, myfunction, contentType, processDat
 			},
 			success:myfunction,
 			error:function(xhr, status, error){
-				//var str = JSON.stringify(xhr);
-				//alert("xhr: " + str + "\nStatus: " + status + "\nError: " + error);
-				//alert("אין תקשורת עם השרת");
+				var str = JSON.stringify(xhr);
+				alert("xhr: " + str + "\nStatus: " + status + "\nError: " + error);
 			}
 	});
 }
 
 function serverURL(){
-	var url = "http://1677c44c.ngrok.io";
+	var url = "http://b0cd08c5.ngrok.io";
 	return url;
 	
 }

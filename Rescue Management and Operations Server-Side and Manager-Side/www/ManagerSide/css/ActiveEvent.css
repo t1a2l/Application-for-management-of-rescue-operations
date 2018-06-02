@@ -64,7 +64,64 @@ h4{
 	margin-right: 50px;
 }
 
+.eventPicturesStyle{
+	background-color:Lightblue; 
+	color: black;
+	width: 160px;
+	font-weight:bold;
+	font-size:20px;
+	margin-top: 30px;
+}
 
+.eventPicUploadLabelStyle{
+	color: black;
+	font-weight:bold;
+	font-size:20px;
+	margin-top: 10px;
+}
+
+.eventPicUploadStyle{
+	color: black;
+	width: 250px;
+	font-weight:bold;
+	font-size:20px;
+}
+
+/* Modal Content (Image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+@media only screen and (max-width: 700px){
+    .modal-content {
+        width: 100%;
+    }
+}
+
+.glyphicon.glyphicon-pencil{
+	top: 7px;
+	color: grey;
+}
+
+.fa.fa-eyedropper{
+	margin-top: 8px;
+	color: grey;
+}
+
+.leaflet-popup-toolbar {
+    position: relative;
+    box-sizing: content-box;
+    padding-right: 0px;
+}
+
+.leaflet-popup-toolbar .leaflet-toolbar-1 {
+    position: absolute;
+    top: 30px;
+    padding-left: 0;
+}
 
 
 

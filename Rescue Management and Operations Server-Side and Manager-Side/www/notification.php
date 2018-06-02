@@ -1,43 +1,80 @@
 <?php
 
-// This page handels the sms sending to the users when new event is starting
+// This page handels the push notification sending to the users when a new event is starting
 
 include 'data_operations.php';
 
+define('SERVER_API_KEY', 'AIzaSyCgNGL67SfCkE9zsWZF0f4mSTxmKz4K13I');
+
 // Getting all the phone numbers and domians of the users that are participating in the event
-$phone_data_command_text = "SELECT phone_number, phone_domain
-							FROM Users
-							WHERE permissions == 2";
+$device_token_command_text = "SELECT device_token
+						      FROM Users
+							  WHERE device_token != NULL";
+
 
 // Initialize an array for the phone data column names
-$phone_data_column_names_array = array("phone_number", "phone_domain");
+$device_token_column_names_array = array("device_token");
 								
 // Set the phone data retrived data array
-$phone_data_retrived_data_array = retrive_sql_data($phone_data_command_text, $phone_data_column_names_array);
+$device_token_retrived_data_array = retrive_sql_data($device_token_command_text, $device_token_column_names_array);
 
 // Get the length of the active phone data retrived data array
-$phone_data_arr_length = count($phone_data_retrived_data_array);
+$device_token_arr_length = count($device_token_retrived_data_array);
 
 // Array to send sms to clients
 $send_to = array();
 
-if($phone_data_arr_length > 0)
+if($device_token_arr_length > 0)
 {
-		// Go through all object and get all phone numbers and phone domains from the users
-		for($data_array_index = 0; $data_array_index < $phone_data_arr_length; $data_array_index++)
-		{
-			// Get the phone number and phone domain from the database
-			$phone_data_object = $phone_data_retrived_data_array[$data_array_index];
-			if(!$send_to)
-				$send_to = $phone_data_object['phone_number'] . "@" . $phone_data_object['phone_domain'];
-			else
-				$send_to .= ", " . $phone_data_object['phone_number'] . "@" . $phone_data_object['phone_domain'];
-		}
-		$from = ""; // Need to set up an amazon domain - cost money
-		$message = "New event available"; // Actuall message
-		$headers = "From: $from\n"; // Message headers
-		$subject = "Rescue Management Operations"; // Message subject
-		mail($send_to, $subject, $message, $headers); // Send an sms to the users
-}		
+	// Go through all object and get all device token of all the users
+	for($data_array_index = 0; $data_array_index < $device_token_arr_length; $data_array_index++)
+	{
+		// Get the device token from the database
+		$device_token_object = $device_token_retrived_data_array[$data_array_index];
+		
+		// Get the actuall token of the users device
+		$token = $device_token_object['device_token'];
+		
+		// Add the token to the tokens array
+		array_push($send_to, $token);
+	}
+	// Message header
+	$header = [
+		'Autorization: Key=' . SERVER_API_KEY,
+		'Content-Type: Application/Json'
+	];
+	
+	// The actuall message
+	$message = [
+		'title' => 'Rescue Management Operations', // Message title
+		'body' => 'A new event is available', // Actuall message
+	];
+	
+	$payload = [
+		'registeration_ids' => $send_to,
+		'data'				=> $message
+	];
+
+	$curl = curl_init();
+
+	curl_setopt_array($curl, array(
+	  CURLOPT_URL => "https://fcm.googleapis.com/fcm/send",
+	  CURLOPT_RETURNTRANSFER => true,
+	  CURLOPT_CUSTOMREQUEST => "POST",
+	  CURLOPT_POSTFIELDS => json_encode($payload),
+	  CURLOPT_HTTPHEADER => $header
+	));
+
+	$response = curl_exec($curl);
+	$err = curl_error($curl);
+
+	curl_close($curl);
+
+	if ($err) {
+	  echo "cURL Error #:" . $err;
+	} else {
+	  echo $response;
+	}
+}
 
 ?>

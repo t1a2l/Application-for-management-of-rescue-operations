@@ -1,9 +1,15 @@
-function ajaxRequest(SendObject, serverPage, myfunction)
+function ajaxRequest(SendObject, serverPage, myfunction, contentType, processData))
 {
+	if(typeof contentType == 'undefined')
+		contentType = "application/x-www-form-urlencoded; charset=UTF-8";
+	if(typeof processData == 'undefined')
+		processData = true;
 	$.ajax({ 
 			type:'POST',
 			url: serverPage,
 			data:SendObject,
+			processData: processData,
+			contentType: contentType,
 			crossDomain: true,
 			beforeSend: function(xhr){
 					xhr.withCredentials = true;

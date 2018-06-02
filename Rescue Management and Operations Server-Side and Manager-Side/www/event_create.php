@@ -56,13 +56,13 @@ if($response_arr[1])
 	// Write the event id to the current session
 	write_to_session('event_id',$event_id);	
 
-	//Run notifications to send sms to users
-	// include 'notifications.php';
-	
 	// Create directory for pictures and change permissions to allow access to pictures of the event
 	mkdir("/wamp64/www/img/$event_id", 0777, true);
 	
-	$echoResult = "";
+	$echoResult = "האירוע נוצר בהצלחה";
+	
+	// Send notifications to clients when a new event starts
+	include notification.php
 	
 	// Check if picture was sent
 	if($event_lost_picture)
@@ -72,10 +72,6 @@ if($response_arr[1])
 		{
 			// Notify the user about uploading failure
 			$echoResult = "האירוע נוצר בהצלחה אך העלאת התמונה נכשלה";
-		}
-		else
-		{
-			$echoResult = "האירוע נוצר בהצלחה";
 		}
 	}
 	// Return success to manager

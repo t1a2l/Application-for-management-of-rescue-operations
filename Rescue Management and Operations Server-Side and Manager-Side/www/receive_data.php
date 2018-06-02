@@ -48,7 +48,7 @@ if(isset($data['session_id']))
 		if($current_event_id == 0)
 		{
 			// If not end the event for the user
-			echo json_encode("EventEnded")
+			echo json_encode("EventEnded");
 			exit();
 		}
 	}
@@ -82,20 +82,27 @@ if(isset($data['session_id']))
 	// Insert all locations to the user table
 	$insert_locations_command_text = "INSERT INTO `locations` (user_id, user_name, event_id, latitude,longitude,timestamp, found_point) VALUES ";
 
-	// array that iclude all the recent locations from the user
+	// array that includes all the recent locations from the user after removing bad points
 	$location_value_arr = array();
 
 	// connectio to the database
 	$sql_connection = connect_to_database();
 
+	// add all locations from user to a location array - every index is a location object
+	$location_arr = array();
+	
 	foreach($data['data'] as $row)
 	{
 		// Check if found bit flag has been raised
 		$found_point = $row['foundBit'];
-		if(count($location_value_arr) > 0 && $found_point == 1)
+		
+		if(count($location_arr) > 0 && $found_point == 1)
 		{
 			$found_point = 0;
 		}
+		
+		// Object that includes latitude, longitude, timestamp and found_point
+		$locationObject = array();
 		
 		// Get the location and time without special charcaters
 		$latitude = mysqli_real_escape_string($sql_connection,$row['lat']);
@@ -103,8 +110,71 @@ if(isset($data['session_id']))
 		$timestamp = mysqli_real_escape_string($sql_connection,$row['time']);
 		
 		// Show timestamp correctly
-		$timestamp = strtotime($timestamp);
-		$timestamp = date('Y/m/d H:i:s', $timestamp + 3 * 3600);
+		$date =  new DateTime($timestamp);
+		$timestamp = date_format($date, 'Y/m/d H:i:s');
+		
+		// Push current row of data to the location object
+		array_push($locationObject, $latitude, $longitude, $timestamp, $found_point);
+		
+		// Push the location object to the location array
+		array_push($location_arr, $locationObject);
+	}
+	
+	// A loop for checking and removing bad points
+	for($i = 1; $i < count($location_arr); $i++)
+	{
+		// First location object data
+		$pointA_lat = $location_arr[i-1][0];
+		$pointA_long = $location_arr[i-1][1];
+		$pointA_time = $location_arr[i-1][2];
+		
+		// Turn the timestamp string to a datetime object format
+		$pointA_datetime = new DateTime($pointA_time);
+		
+		// Second location object data
+		$pointB_lat = $location_arr[i][0];
+		$pointB_long = $location_arr[i][1];
+		$pointB_time = $location_arr[i][2];
+		
+		// Turn the timestamp string to a datetime object format
+		$pointB_datetime = new DateTime($pointB_time);
+		
+		// Get the absolute value of the seconds between the two points
+		$seconds_between_points = abs(date_timestamp_get($pointA_datetime) - date_timestamp_get($pointB_datetime));
+
+		// Average walking speed of a human in meters per seconds
+		$person_walk_speed = 1.25;
+		
+		// The max distance a person can go according to the speed and time provided
+		$max_distance = $person_walk_speed * $seconds_between_points;
+		
+		// Get the actual distance between the two points
+		$actual_distance = distanceInMetersBetweenEarthCoordinates($pointA_lat, $pointA_long, $pointB_lat, $pointB_long);
+		
+		// If the max distance is smaller then the actual distance it is a bad point
+		if($max_distance < $actual_distance)
+		{
+			// Remove the bad point object from the array
+			array_splice($location_arr, $i, 1);
+			
+			// Go down one index - because splice function remove the object
+			// and remap the indexes in the array so for example 2 turns to 1
+			// because 1 was removed for being bad point and we need to check 0 
+			// with the new 1 (that was 2 before)
+			$i--;
+		}
+	}
+
+	// Set the string array of the locations as empty
+	$location_value_arr[] = "";
+	
+	for($x = 0; $x < count($location_arr); $x++)
+	{
+		// Get the objects from the location array after removing all the bad points
+		$latitude = $location_arr[$x][0];
+		$longitude = $location_arr[$x][1];
+		$timestamp = $location_arr[$x][2];
+		$found_point = $location_arr[$x][3];
 		
 		// Insert the current location to the locations value array
 		$location_value_arr[] .= "('$user_id', '$username', '$event_id', '$latitude', '$longitude', '$timestamp', '$found_point')";

@@ -2,9 +2,25 @@ var mainFunction = (function()
 {
 	var webURL; // server url
 	var LocationsArr;
+	var center;
+	var latitude;
+	var longitude;
+	var map;
 	
 	function NewEventForm(){ // send login info to server and recieve a session to work with
-		var formData = new FormData($('#NewEventForm')[0]);
+		var formData = new FormData();
+		formData.append('EventName', document.getElementById('EventNam').value);
+		if($("input[name='byType']:checked").val() == "City")
+		{
+			var locArr = document.getElementById('EventLoc');
+			formData.append('EventLocation', locArr[locArr.value].text);
+		}
+		else
+		{
+			formData.append('EventLocation', latitude +', ' + longitude);
+		}
+		formData.append('EventDescription', document.getElementById('EventDes').value);
+		formData.append('EventLostPic', document.getElementById('EventPic').value);
 		ajaxRequest(formData, webURL + "/event_create.php", NewEventFormResult, false, false);
 	}
 	
@@ -24,13 +40,13 @@ var mainFunction = (function()
 		
 	}
 	
-	function GetLocations(){
+	function GetLocations(){ // Get locations from server (cities names)
 		var CitiesFile = "excel/CitiesInIsrael.xlsx";
 		var CityList = {targetFile : CitiesFile};
 		ajaxRequest(CityList, webURL + "/locations_list.php", GetLocationsResult);
 	}
 	
-	function GetLocationsResult(response){
+	function GetLocationsResult(response){ // populate the select with cities names
 		response = response.trim();
 		if(response == "")
 		{
@@ -58,12 +74,57 @@ var mainFunction = (function()
 			}
 		}
 	}
+
+	function initializeMap(){ // Set map start location
+		center = new google.maps.LatLng(31.793058, 35.22500969);
+		var mapOptions = {
+			zoom: 7,
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			center: center
+		};
+
+		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+		var marker = new google.maps.Marker({ // Move marker to the wanted position
+			map:map,
+			draggable:true,
+			animation: google.maps.Animation.DROP,
+			position: center
+		});
+		
+		google.maps.event.addListener(marker, 'dragend', function(){
+			geocodePosition(marker.getPosition());
+		});
+	}
+	
+	function geocodePosition(pos){ // Get the positon of the marker and send it to the server
+	   geocoder = new google.maps.Geocoder();
+	   geocoder.geocode
+		({
+			latLng: pos
+		}, 
+			function(results, status) 
+			{
+				if (status == google.maps.GeocoderStatus.OK) 
+				{
+					latitude = results[0].geometry.location.lat();
+					longitude = results[0].geometry.location.lng();
+				} 
+				else 
+				{
+					$("#mapErrorMsg").html('Cannot determine address at this location.'+status).show(100);
+				}
+			}
+		);
+	}
+	
 		
 	$("document").ready(function(){
-		webURL = serverURL(); // server url
+		webURL = serverURL(); // Server URL
 		GetLocations();
+		initializeMap();
 		
-		$('#NewEventForm').submit(function(event){ // enter the homescreen
+		$('#NewEventForm').submit(function(event){ // Register the new event to the database
 			event.preventDefault();
 			NewEventForm();
 		});
@@ -72,10 +133,20 @@ var mainFunction = (function()
 			GetLocations();
 		});
 		
-		$(document).on("click", "#BackBtn", function(){ // Create new event
+		$(document).on("click", "#MapBtn", function(){ // Choose location from the map
+			$('#mapModal').modal({
+				backdrop: 'static',
+				keyboard: false
+			}).on('shown.bs.modal', function () {
+				google.maps.event.trigger(map, 'resize');
+			});
+		});
+		
+		$(document).on("click", "#BackBtn", function(){ // Go back to the main menu
 			event.preventDefault();
 			window.location.href = "MainPage.html";
 		});
 		
+	
 	});
 }());

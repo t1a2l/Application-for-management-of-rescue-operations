@@ -3,7 +3,21 @@ body{
 	margin: 0; 
 	height: 100%; 
 	overflow: hidden;
-} 
+}
+
+body, .modal-open .page-container, .modal-open .page-container .navbar-fixed-top, .modal-open .modal-container {
+    overflow-y: scroll;
+}
+
+@media (max-width: 979px) {
+    .modal-open .page-container .navbar-fixed-top {
+        overflow-y: visible;
+    }
+}
+
+#map-canvas {
+    height: 400px;
+}
 
 h1{
 	text-align:center; 
@@ -38,6 +52,16 @@ h3{
 	margin-top: 3px;
 	background-color: grey;
 	color: black;
+}
+
+.MapBtnStyle{
+	margin-top: 3px;
+	background-color: green;
+	color: blue;
+}
+
+.selectCity{
+	display : inline-block;
 }
 
 .DescStyle{

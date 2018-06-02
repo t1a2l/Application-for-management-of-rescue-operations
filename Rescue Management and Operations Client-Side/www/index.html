@@ -6,6 +6,19 @@
 		<link rel = "stylesheet" href = "css/external/bootstrap.css" />
 		<link rel = "stylesheet" href = "css/external/bootstrap.rtl.css" />
 		<link rel = "stylesheet" href = "css/index.css" />
+		<script src="https://www.gstatic.com/firebasejs/5.0.2/firebase.js"></script>
+		<script>
+		  // Initialize Firebase
+		  var config = {
+			apiKey: "AIzaSyAugPJk9BTF6fYciQl_HvZAEtlnFqbpxTE",
+			authDomain: "rmo-notifications.firebaseapp.com",
+			databaseURL: "https://rmo-notifications.firebaseio.com",
+			projectId: "rmo-notifications",
+			storageBucket: "rmo-notifications.appspot.com",
+			messagingSenderId: "18425284"
+		  };
+		  firebase.initializeApp(config);
+		</script>
 		<script src="js/external/jquery.js"></script>
 		<script src="js/external/jquery.form.js"></script>
 		<script src="js/external/bootstrap.min.js"></script>
@@ -84,6 +97,34 @@
 					</div>
 					<div class="col-xs-6">
 						<button id="found" type="button" class="btn btn-primary foundBtnStyle">מצאתי</button>
+					</div>
+				</div>
+			</div>
+			<div id="imageModal" class="modal fade">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header"></div>
+						<div class="modal-body">
+							<img class="modal-content" id="currentImage">
+						</div>
+						<div class="modal-footer">
+							<button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="cameraModal" class="modal fade">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header"></div>
+						<div class="modal-body">
+							<img class="modal-content" id="cameraImage">
+						</div>
+						<div class="modal-footer">
+							<button id="sendPic" type="button" data-dismiss="modal" class="btn btn-primary">Send</button>
+							<button id="anotherPic" type="button" data-dismiss="modal" class="btn btn-primary">Try Again</button>
+							<button type="button" data-dismiss="modal" class="btn btn-primary">Cancel</button>
+						</div>
 					</div>
 				</div>
 			</div>

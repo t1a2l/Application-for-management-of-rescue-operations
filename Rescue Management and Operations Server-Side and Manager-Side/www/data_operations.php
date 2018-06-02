@@ -94,6 +94,7 @@ function execute_sql_command($sql_command_text)
 	if($sql_connection) 
 	{
 		mysqli_set_charset($sql_connection,"utf8");
+		
 		// Set the SQL command
 		$sql_command = mysqli_prepare($sql_connection, $sql_command_text);
 
@@ -203,5 +204,25 @@ function tableExist($table_name)
 	// Return the array length, if it is greater then zero it means the table exists
 	return count($locations_table_check_retrived_data_array);
 }
+
+function degreesToRadians($degrees){
+  return $degrees * pi() / 180;
+}
+
+function distanceInMetersBetweenEarthCoordinates($lat1, $lon1, $lat2, $lon2) {
+  $earthRadiusMeters = 6371000;
+
+  $dLat = degreesToRadians($lat2-$lat1);
+  $dLong = degreesToRadians($lon2-$lon1);
+
+  $lat1 = degreesToRadians($lat1);
+  $lat2 = degreesToRadians($lat2);
+
+  $a = sin($dLat/2) * sin($dLat/2) + sin($dLong/2) * sin($dLong/2) * cos($lat1) * cos($lat2); 
+  $c = 2 * atan2(sqrt($a), sqrt(1-$a)); 
+  return $earthRadiusMeters * $c;
+}
+
+
 
 ?>

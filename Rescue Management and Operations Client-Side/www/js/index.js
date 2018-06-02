@@ -3,9 +3,9 @@ var mainFunction = (function()
 	document.addEventListener("deviceready", onDeviceReady, false);
 	var ActiveSession; // the active session
 	var Events = null; // Events to show in the choose event screen
-	var webURL = "http://1677c44c.ngrok.io"; // Server URL
+	var webURL = "http://d4db17c4.ngrok.io"; // Server URL
 	var inEvent = false;
-	var bgGeo; // init inside getLocation()
+	var bgGeo; // init inside getLocation function
 	var ChosenEvent = []; // Array that holds the chosen event properties
 	var imageArr = []; // Array that holds all images of the lost perosn
 	var currentImage; // The active image the is showen in the active event page currrently
@@ -33,6 +33,7 @@ var mainFunction = (function()
 			response = response.replace('success','');
 			$('#LoginForm').hide();
 			ActiveSession = response;
+			setNotification();
 			var MySession = {session_id : ActiveSession};
 			ajaxRequest(MySession, webURL + "/rejoin_event.php", connectedToEvent);
 		}
@@ -218,10 +219,31 @@ var mainFunction = (function()
 		document.getElementById("eventPicture").src = currentImage;
 	}
 	
-	function TakePicture(){
-		navigator.getPicture(successCallback, errorCallback, options)
+	function TakePicture(){ // Take a picture and send to manager
+		navigator.getPicture(picSuccessCallback, picErrorCallback, options)
+	}
+	
+	function picSuccessCallback(imageData){
+		var imageCamera = document.getElementById('cameraImage');
+		imageCamera.src = "data:image/jpeg;base64," + imageData;
+		$('#cameraModal').modal('show');
+	}
+	
+	function picErrorCallback(response){
+		alert("Error: " + response);
+	}
 		
-		
+	function sendPicToServer(){
+		var pic = new FormData();
+		pic.append('imageCamera', document.getElementById('cameraImage').src);
+		pic.append('session_id', ActiveSession);
+		ajaxRequest(pic, webURL + "/img_upload.php", sendPicSuccess, false, false);
+	}
+	
+	function sendPicSuccess(response){
+		response = response.trim();
+		response = response.replace(/['"]+/g, '');
+		alert(response);
 	}
 		
 	function getLocation()
@@ -381,8 +403,38 @@ var mainFunction = (function()
 		document.addEventListener("resume", onResume, false);
 		document.addEventListener("menubutton", onMenuKeyDown, false);
 		document.addEventListener("backbutton", onBackKeyDown, false);
+		window.FirebasePlugin.hasPermission(function(data){
+			console.log(data.isEnabled);
+		});
 	}
-		
+	
+	function setNotification(){
+		window.FirebasePlugin.onTokenRefresh(function(token) { // Generates a token for the device
+			SendTokenToServer(token);
+		}, function(error) {
+			console.error(error);
+		});
+		window.FirebasePlugin.subscribe("Rescue-New-Event");
+	}
+	
+	function SendTokenToServer(token){ // Send the token to the database
+		var TokenData = {session_id : ActiveSession, my_token : token};
+		ajaxRequest(TokenData, webURL + "/token.php", tokenResult);
+	}
+	
+	function tokenResult(response){ // Get database insert result
+		response = response.trim();
+		response = response.replace(/['"]+/g, '');
+		if(response == "Success")
+		{
+			alert("device is in the database");
+		}
+		else
+		{
+			alert(response);
+		}
+	}
+	
 	function onPause()
 	{
 		
@@ -468,9 +520,22 @@ var mainFunction = (function()
 			document.getElementById("found").disabled = true;
 		});
 		
-		$(document).on("click", "#TakePic", function(){ // Take a picture and send it to the database
+		$(document).on("click", "#TakePic, #anotherPic", function(){ // Take a picture and send it to the database
 			event.preventDefault();
 			TakePicture();
+		});
+		
+		$(document).on("click", "#sendPic", function(){ // Take a picture and send it to the database
+			event.preventDefault();
+			sendPicToServer();
+		});
+		
+		$(document).on("click", "#eventPicture", function(){ // Enlarge picture
+			event.preventDefault();
+			var MyPic = document.getElementById('eventPicture');
+			var currentImg = document.getElementById("currentImage");
+			currentImg.src = MyPic.src;
+			$('#imageModal').modal('show');
 		});
 
 	});	
