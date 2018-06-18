@@ -3,10 +3,24 @@
 // This page handels the locations and send them to the manager side
 
 header('Access-Control-Allow-Origin: *');
+
+// If the user session ID is set
+if(isset($_POST['session_id']))
+{
+	// Get the user session ID
+	$session_id=$_POST['session_id'];
+	
+	// Set the user session ID
+	session_id($session_id);
+}
+
 include 'head.php';
 include 'data_operations.php';
 
-if(isset($_POST['currentLocations']))
+// Get the user belongs to the session
+$user_id = read_from_session('session_user_id');
+
+if(isset($_SESSION['session_user_id']) && $_SESSION['session_user_id'] == $user_id && isset($_POST['currentLocations']))
 {	
 	// Set the time stamp object
 	$location_object = $_POST['currentLocations'];

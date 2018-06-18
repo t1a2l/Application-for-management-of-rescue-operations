@@ -3,7 +3,7 @@ var mainFunction = (function()
 	document.addEventListener("deviceready", onDeviceReady, false);
 	var ActiveSession; // the active session
 	var Events = null; // Events to show in the choose event screen
-	var webURL = "http://d4db17c4.ngrok.io"; // Server URL
+	var webURL = "http://ec2-18-191-118-133.us-east-2.compute.amazonaws.com"; // Server URL
 	var inEvent = false;
 	var bgGeo; // init inside getLocation function
 	var ChosenEvent = []; // Array that holds the chosen event properties
@@ -11,6 +11,8 @@ var mainFunction = (function()
 	var currentImage; // The active image the is showen in the active event page currrently
 	var BackGroundColorArr = []; // Color array to background of the events to choose from
 	var foundPoint = 0; // Person was found bit
+	var EventID;
+	var ImageInterval;
 	
 	function SubForm() // Send login info to server and recieve a session to work with
 	{ 
@@ -33,7 +35,7 @@ var mainFunction = (function()
 			response = response.replace('success','');
 			$('#LoginForm').hide();
 			ActiveSession = response;
-			setNotification();
+			//setNotification();
 			var MySession = {session_id : ActiveSession};
 			ajaxRequest(MySession, webURL + "/rejoin_event.php", connectedToEvent);
 		}
@@ -144,8 +146,8 @@ var mainFunction = (function()
 	
 	function joinEvent(id) // Send the id of the event to join
 	{ 
-		var eventID = id;
-		var sendInfo = { event_id : eventID, session_id : ActiveSession};
+		EventID = id;
+		var sendInfo = { event_id : EventID, session_id : ActiveSession};
 		ajaxRequest(sendInfo, webURL + "/join_event.php", joinResults);
 	}
 	
@@ -165,6 +167,7 @@ var mainFunction = (function()
 		else
 		{
 			alert(response);
+			EventID = "";
 		}
 	}
 		
@@ -174,6 +177,7 @@ var mainFunction = (function()
 		document.getElementById('eventLocation').innerHTML = ChosenEvent["event_location"];
 		document.getElementById('eventDescription').innerHTML = ChosenEvent["event_description"];
 		getImages();
+		ImageInterval = setInterval(getImages, 120000);
 		$("#showLocation").show();
 		$('.nav li.EndEvent').removeClass('disabled');
 		$('.nav li.LogOut').addClass('disabled');
@@ -183,7 +187,7 @@ var mainFunction = (function()
 	
 	function getImages() // Get images from the server related to the event
 	{ 
-		var MyImages = {session_id : ActiveSession};
+		var MyImages = {event_id : EventID, session_id : ActiveSession};
 		ajaxRequest(MyImages, webURL + "/img_download.php", imageResult);
 	}
 	
@@ -196,7 +200,7 @@ var mainFunction = (function()
 			imageArr = JSON.parse(response);
 			for(var i = 0; i < imageArr.length; i++)
 			{
-				imageArr[i] = imageArr[i].replace("/wamp64/www", "");
+				imageArr[i] = imageArr[i].replace("img", "/img");
 				imageArr[i] = webURL + imageArr[i];
 			}
 			currentImage = imageArr[0];
@@ -206,6 +210,7 @@ var mainFunction = (function()
 	
 	function ChangePicture() // Change the displayed picture of the current event
 	{
+		
 		var ImageIndex = imageArr.indexOf(currentImage);
 		if(ImageIndex == imageArr.length - 1) // The last picture
 		{
@@ -216,28 +221,44 @@ var mainFunction = (function()
 			ImageIndex++;
 			currentImage = imageArr[ImageIndex];
 		}
-		document.getElementById("eventPicture").src = currentImage;
+		var eventPicture = document.getElementById("eventPicture");
+		eventPicture.onload = function(){
+			document.getElementById('ChangePic').disabled = false;
+		}
+		eventPicture.src = currentImage;
 	}
 	
 	function TakePicture(){ // Take a picture and send to manager
-		navigator.getPicture(picSuccessCallback, picErrorCallback, options)
+		navigator.camera.getPicture(cameraSuccess, cameraError, {
+			destinationType: Camera.DestinationType.DATA_URL
+		});
 	}
 	
-	function picSuccessCallback(imageData){
+	function cameraSuccess(imageData){
 		var imageCamera = document.getElementById('cameraImage');
 		imageCamera.src = "data:image/jpeg;base64," + imageData;
 		$('#cameraModal').modal('show');
 	}
 	
-	function picErrorCallback(response){
+	function cameraError(response){
 		alert("Error: " + response);
 	}
 		
 	function sendPicToServer(){
 		var pic = new FormData();
-		pic.append('imageCamera', document.getElementById('cameraImage').src);
+		pic.append('imageUpload', document.getElementById('cameraImage').src);
+		var imageName = document.getElementById("cameraImageName").value + ".png";
+		pic.append('imageUploadName', imageName);
+		pic.append('eventID', EventID);
 		pic.append('session_id', ActiveSession);
-		ajaxRequest(pic, webURL + "/img_upload.php", sendPicSuccess, false, false);
+		if(imageName != "")
+		{
+			ajaxRequest(pic, webURL + "/img_upload.php", sendPicSuccess, false, false);
+		}
+		else
+		{
+			alert("No image name");
+		}
 	}
 	
 	function sendPicSuccess(response){
@@ -265,7 +286,8 @@ var mainFunction = (function()
 					}
 				},
 				params:{
-					session_id : ActiveSession
+					session_id : ActiveSession,
+					event_id : EventID
 				},
 				httpRootProperty: 'data',
 				locationTemplate: '{"time":"<%= timestamp %>", "lat":<%= latitude %>, "lng":<%= longitude %>}',
@@ -294,7 +316,6 @@ var mainFunction = (function()
 		var responseText = response.responseText;
 		responseText = responseText.replace(/(\r\n|\n|\r)/gm,"");
 		responseText = responseText.trim();
-		//alert(responseText);
 		if(foundPoint == 1)
 		{
 			foundPoint = 0;
@@ -323,10 +344,6 @@ var mainFunction = (function()
 		var longitude = coords.longitude;
 		var speed = coords.speed;
 		var userLocation = "lat: " + latitude + ", lon: " + longitude + ", time: " + timestamp;
-		//alert(userLocation);
-		// testing:
-		//document.getElementById("userLocation").innerHTML = "";
-		//document.getElementById("userLocation").innerHTML = "lat: " + latitude + ", lon: " + longitude + ", time: " + timestamp;
 	}
 		
 	function failureFn(errorCode) // location retrived failure
@@ -366,6 +383,7 @@ var mainFunction = (function()
 			$("#showLocation").hide();
 			$("#Events").show();
 			inEvent = false;
+			clearInterval(ImageInterval);
 		}
 		else
 		{
@@ -375,7 +393,7 @@ var mainFunction = (function()
 	
 	function LogOut() // Request to log out from app
 	{
-		var logout = {session_id : ActiveSession};
+		var logout = {event_id : EventID, session_id : ActiveSession};
 		ajaxRequest(logout, webURL + "/logout.php", LogOutResult);
 	}
 	
@@ -403,37 +421,38 @@ var mainFunction = (function()
 		document.addEventListener("resume", onResume, false);
 		document.addEventListener("menubutton", onMenuKeyDown, false);
 		document.addEventListener("backbutton", onBackKeyDown, false);
-		window.FirebasePlugin.hasPermission(function(data){
-			console.log(data.isEnabled);
-		});
+		document.addEventListener("keypress", onKeyPress, false);
+		// window.FirebasePlugin.hasPermission(function(data){
+			// console.log(data.isEnabled);
+		// });
 	}
 	
-	function setNotification(){
-		window.FirebasePlugin.onTokenRefresh(function(token) { // Generates a token for the device
-			SendTokenToServer(token);
-		}, function(error) {
-			console.error(error);
-		});
-		window.FirebasePlugin.subscribe("Rescue-New-Event");
-	}
+	// function setNotification(){
+		// window.FirebasePlugin.onTokenRefresh(function(token) { // Generates a token for the device
+			// SendTokenToServer(token);
+		// }, function(error) {
+			// console.error(error);
+		// });
+		// window.FirebasePlugin.subscribe("Rescue-New-Event");
+	// }
 	
-	function SendTokenToServer(token){ // Send the token to the database
-		var TokenData = {session_id : ActiveSession, my_token : token};
-		ajaxRequest(TokenData, webURL + "/token.php", tokenResult);
-	}
+	// function SendTokenToServer(token){ // Send the token to the database
+		// var TokenData = {session_id : ActiveSession, my_token : token};
+		// ajaxRequest(TokenData, webURL + "/token.php", tokenResult);
+	// }
 	
-	function tokenResult(response){ // Get database insert result
-		response = response.trim();
-		response = response.replace(/['"]+/g, '');
-		if(response == "Success")
-		{
-			alert("device is in the database");
-		}
-		else
-		{
-			alert(response);
-		}
-	}
+	// function tokenResult(response){ // Get database insert result
+		// response = response.trim();
+		// response = response.replace(/['"]+/g, '');
+		// if(response == "Success")
+		// {
+			// alert("device is in the database");
+		// }
+		// else
+		// {
+			// alert(response);
+		// }
+	// }
 	
 	function onPause()
 	{
@@ -457,6 +476,19 @@ var mainFunction = (function()
 	function onBackKeyDown() // Ignore the back button
 	{ 
 		
+	}
+	
+	function onKeyPress(event){
+		var ew = event.which;
+		if(ew == 32)
+			return true;
+		if(48 <= ew && ew <= 57)
+			return true;
+		if(65 <= ew && ew <= 90)
+			return true;
+		if(97 <= ew && ew <= 122)
+			return true;
+		return false;
 	}
 	
 	$("document").ready(function()
@@ -502,6 +534,7 @@ var mainFunction = (function()
 		
 		$(document).on("click", "#ChangePic", function(){ // Change Displayed picture
 			event.preventDefault();
+			document.getElementById('ChangePic').disabled = true;
 			ChangePicture();
 		});
 				
@@ -520,12 +553,12 @@ var mainFunction = (function()
 			document.getElementById("found").disabled = true;
 		});
 		
-		$(document).on("click", "#TakePic, #anotherPic", function(){ // Take a picture and send it to the database
+		$(document).on("click", "#TakePic, #anotherPic", function(){ // Take a picture using the camera
 			event.preventDefault();
 			TakePicture();
 		});
 		
-		$(document).on("click", "#sendPic", function(){ // Take a picture and send it to the database
+		$(document).on("click", "#sendPic", function(){ // send the camera picture it to the database
 			event.preventDefault();
 			sendPicToServer();
 		});
@@ -537,7 +570,6 @@ var mainFunction = (function()
 			currentImg.src = MyPic.src;
 			$('#imageModal').modal('show');
 		});
-
 	});	
 	
 }());

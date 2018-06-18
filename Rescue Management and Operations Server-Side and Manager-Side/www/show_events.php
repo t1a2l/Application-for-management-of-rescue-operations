@@ -6,16 +6,20 @@ header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Content-Type: application/json; charset=iso-8859-1');
 
+// If the user session ID is set
 if(isset($_POST['session_id']))
 {
+	// Get the user session ID
 	$session_id=$_POST['session_id'];
+	
+	// Set the user session ID
 	session_id($session_id);
 }
+
 include 'head.php';
 include 'data_operations.php';
 
 $user_id = read_from_session('session_user_id');
-//$user_id = 7;
 
 if(isset($_SESSION['session_user_id']) && $_SESSION['session_user_id'] == $user_id)
 {

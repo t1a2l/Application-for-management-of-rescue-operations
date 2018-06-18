@@ -3,14 +3,12 @@
 // This page handels the push notification sending to the users when a new event is starting
 
 include 'data_operations.php';
-
 define('SERVER_API_KEY', 'AIzaSyCgNGL67SfCkE9zsWZF0f4mSTxmKz4K13I');
 
 // Getting all the phone numbers and domians of the users that are participating in the event
 $device_token_command_text = "SELECT device_token
 						      FROM Users
 							  WHERE device_token != NULL";
-
 
 // Initialize an array for the phone data column names
 $device_token_column_names_array = array("device_token");

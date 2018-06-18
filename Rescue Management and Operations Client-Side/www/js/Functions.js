@@ -1,4 +1,4 @@
-function ajaxRequest(SendObject, serverPage, myfunction, contentType, processData))
+function ajaxRequest(SendObject, serverPage, myfunction, contentType, processData)
 {
 	if(typeof contentType == 'undefined')
 		contentType = "application/x-www-form-urlencoded; charset=UTF-8";

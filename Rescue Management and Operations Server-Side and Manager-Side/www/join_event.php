@@ -73,8 +73,7 @@ if(isset($_POST['event_id']))
 			exit();
 		}
 	}
-	
-	if($user_event_id_arr_length > 0)
+	else if($user_event_id_arr_length > 0)
 	{
 		echo json_encode("success אתה כבר חלק מהאירוע");
 	}

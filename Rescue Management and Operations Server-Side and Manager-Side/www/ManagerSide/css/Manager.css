@@ -1,0 +1,232 @@
+body{
+	background: linear-gradient(to right, red , yellow);
+	margin: 0; 
+	height: 100%; 
+	overflow: hidden;
+}
+
+body, .modal-open .page-container, .modal-open .page-container .navbar-fixed-top, .modal-open .modal-container {
+    overflow-y: scroll;
+}
+
+@media (max-width: 979px) {
+    .modal-open .page-container .navbar-fixed-top {
+        overflow-y: visible;
+    }
+}
+
+#map-canvas {
+    height: 400px;
+}
+
+.mapStyle{
+	 margin-top:30px;
+	 height: 600px; 
+	 width:900px;
+}
+
+h1{
+	text-align:center; 
+	margin-top:50px; 
+	font-weight:bold; 
+	font-size:80px;
+	background: -webkit-linear-gradient(blue, green);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+h3{
+	text-align:center; 
+	margin-top:30px; 
+	font-weight:bold; 
+	font-size:35px;
+	background: -webkit-linear-gradient(blue, green);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+h4{
+	text-align:center; 
+	margin-top:30px; 
+	font-weight:bold; 
+	font-size:30px;
+	background: -webkit-linear-gradient(blue, green);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.SignInlabelStyle{
+	font-weight:bold; 
+	background: -webkit-linear-gradient(black, green);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.SignInSubmitStyle{
+	background-color: LimeGreen;
+	margin-right:130px;
+	margin-top: 20px;
+	width: 100px;
+	color: white;
+	font-weight:bold;
+	font-size:20px;
+	font-family: "Times New Roman", Times, serif;
+}
+
+.MainPageStyle{
+	margin-top:180px;
+}
+
+.newEventBtnStyle{
+	background-color: LightSalmon;
+	color: white;
+	font-weight:bold; 
+	border-color: black;
+}
+
+.joinEventBtnStyle{
+	background-color: LightSeaGreen;
+	color: white;
+	font-weight:bold; 
+	border-color: black;
+}
+
+.logoutBtnStyle{
+	background-color: MediumOrchid;
+	color: white;
+	font-weight:bold; 
+	border-color: black;
+}
+
+.LabelStyle{
+	font-weight:bold; 
+	background: -webkit-linear-gradient(black, green);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-weight:bold;
+	font-size:20px;
+}
+
+.RefreshBtnStyle{
+	margin-top: 3px;
+	background-color: grey;
+	color: black;
+}
+
+.MapBtnStyle{
+	margin-top: 3px;
+	background-color: green;
+	color: blue;
+}
+
+.selectCity{
+	display : inline-block;
+}
+
+.DescStyle{
+	margin-top: 10px;
+}
+
+.EventCreateBtnStyle{
+	background-color:LightGreen; 
+	color: black;
+	width: 100px;
+	font-weight:bold;
+	font-size:20px;
+}
+
+.BackBtnStyle{
+	background-color:purple; 
+	width: 100px;
+	font-weight:bold;
+	font-size:20px;
+	margin-right: 54px;
+	color: black;
+}
+
+.loader {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.endEventStyle{
+	background-color:LightGreen; 
+	color: black;
+	width: 120px;
+	font-weight:bold;
+	font-size:20px;
+	margin-top: 180px;
+	margin-right: 50px;
+}
+
+.eventPicturesStyle{
+	background-color:Lightblue; 
+	color: black;
+	width: 160px;
+	font-weight:bold;
+	font-size:20px;
+	margin-top: 30px;
+}
+
+.eventPicUploadLabelStyle{
+	color: black;
+	font-weight:bold;
+	font-size:20px;
+	margin-top: 10px;
+}
+
+.eventPicUploadStyle{
+	color: black;
+	width: 250px;
+	font-weight:bold;
+	font-size:20px;
+}
+
+/* Modal Content (Image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+@media only screen and (max-width: 700px){
+    .modal-content {
+        width: 100%;
+    }
+}
+
+.glyphicon.glyphicon-pencil{
+	top: 7px;
+	color: grey;
+}
+
+.fa.fa-eyedropper{
+	margin-top: 8px;
+	color: grey;
+}
+
+.leaflet-popup-toolbar {
+    position: relative;
+    box-sizing: content-box;
+    padding-right: 0px;
+}
+
+.leaflet-popup-toolbar .leaflet-toolbar-1 {
+    position: absolute;
+    top: 30px;
+    padding-left: 0;
+}
+
+
+
+

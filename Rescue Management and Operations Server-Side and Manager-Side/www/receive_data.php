@@ -14,16 +14,16 @@ if(isset($data['session_id']))
 	
 	// set the current session as the one to work with
 	session_id($session_id);
-	
-	include 'head.php';
-	include 'data_operations.php';
+}
 
-	// Read the event id from the current session
-	$event_id = read_from_session('event_id');
+include 'head.php';
+include 'data_operations.php';
 
-	// Read the user id from the current session
-	$user_id = read_from_session('session_user_id');
-	
+// Read the user id from the current session
+$user_id = read_from_session('session_user_id');
+
+if(isset($_SESSION['session_user_id']) && $_SESSION['session_user_id'] == $user_id)
+{
 	// Command text to check if current event has ended by manager
 	$event_check_command_text = "SELECT event_id 
 								 FROM users 
@@ -201,7 +201,7 @@ if(isset($data['session_id']))
 }
 else
 {
-	echo json_encode('no session');
+	echo json_encode('Unkonwen user');
 }	
 
 ?>

@@ -116,23 +116,17 @@ function execute_sql_command($sql_command_text)
 }
 
 // *** Upload a picture to the server returns true on success or false on failure *** //
-// *** Parameters: the event id, the file to be uploaded *** //
-function upload_file($event_id, $file)
+// *** Parameters: the event id, the picture name, the picture data *** //
+function upload_file($event_id, $picture_name, $picture_data)
 {
-		// Set the file target path
-		$target_dir = "/wamp64/www/img/$event_id/";
-		
-		// Add the file name to the target path - basename takes the end of the path of the file, the actuall name
-		$target_file = $target_dir . basename($file["name"]);
-		
-		// Get the file type (picture, exe, etc)
-		$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-		
-		// Move the file to the target path
-		$result = move_uploaded_file($file["tmp_name"], $target_file);
-		
-		// Return the uploading result
-		return $result;
+	// Set save directory
+	$dir = "img/$event_id";
+
+	// Save Image to database
+	$result = file_put_contents("$dir/$picture_name", file_get_contents("data://".$picture_data));
+	
+	return $result;
+
 }
 
 // *** Download a picture from the server to the client mobile device *** //
@@ -140,11 +134,11 @@ function upload_file($event_id, $file)
 function download_file($event_id)
 {
 		// Set the file target path
-		$dir = "/wamp64/www/img/$event_id/";
+		$dir = "img/$event_id/";
 		
 		$image_arr = array();
 
-		$images = glob($dir."*.jpg");
+		$images = glob($dir."*.*");
 		
 		foreach($images as $image) {
 			array_push($image_arr, $image); 
@@ -205,11 +199,15 @@ function tableExist($table_name)
 	return count($locations_table_check_retrived_data_array);
 }
 
+// *** Convert degrees to radians *** //
+// *** Parameters: degrees *** //
 function degreesToRadians($degrees){
   return $degrees * pi() / 180;
 }
 
-function distanceInMetersBetweenEarthCoordinates($lat1, $lon1, $lat2, $lon2) {
+// *** Check the ditance between two points on the map *** //
+// *** Parameters: latitude1, longitude1, latitude2, longitude2 *** //
+function distanceInMetersBetweenEarthCoordinates($lat1, $lon1, $lat2, $lon2){
   $earthRadiusMeters = 6371000;
 
   $dLat = degreesToRadians($lat2-$lat1);
@@ -223,6 +221,40 @@ function distanceInMetersBetweenEarthCoordinates($lat1, $lon1, $lat2, $lon2) {
   return $earthRadiusMeters * $c;
 }
 
+// *** Get the captcha secret from the database *** //
+// *** Parameters: Permission-level *** //
+function get_captcha($permissions){
+	
+	// Get the captcha secret
+	$captcha_command_text = "SELECT value
+							 FROM captcha
+							 WHERE Id = '$permissions'";
 
+	// Initialize an array for the captcha column names
+	$captcha_names_array = array('value');
+									
+	// Set the captcha retrived data array
+	$captcha_retrived_data_array = retrive_sql_data($captcha_command_text, $captcha_names_array);
+
+	// Get the length of the captcha retrived data array
+	$captcha_arr_length = count($captcha_retrived_data_array);
+
+	// If there is a captcha
+	if($captcha_arr_length > 0)
+	{
+		// Get the captcha object
+		$captcha_object = $captcha_retrived_data_array[0];
+		
+		// Get the captcha
+		$captcha_secret = $captcha_object['value'];
+		
+		// Send the array of events to the clients to show all events
+		return $captcha_secret;
+	}
+	else
+	{
+		return "Failed";
+	}
+}
 
 ?>

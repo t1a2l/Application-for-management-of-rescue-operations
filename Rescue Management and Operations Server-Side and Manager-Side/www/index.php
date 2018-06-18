@@ -10,7 +10,8 @@ header('Access-Control-Max-Age: 1728000');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers:  Content-Type, *');
 header('Access-Control-Allow-Credentials: true');
-header('Content-Type: application/json; charset=iso-8859-1');
+//header('Content-Type: application/json; charset=iso-8859-1');
+//header('Content-Type: application/x-www-form-urlencoded; charset=utf-8');
 
 // Check if the user login details object is set ...
 if(isset($_POST['userLoginDetails']))
@@ -24,6 +25,8 @@ if(isset($_POST['userLoginDetails']))
 	$password = $user_login_details['password'];
 
 	$entrance_type = $user_login_details['source'];
+	
+	$response = $user_login_details["recaptcha"];
 
 	// Check that all the required fields are not empty ...
 	foreach(array($user_name, $password) as $user_login_details_property)
@@ -70,28 +73,78 @@ if(isset($_POST['userLoginDetails']))
 		$user_id = $signed_user_object['user_id'];
 
 		// Write the current user id to the current session ...
-		if($signed_user_object["permissions"] == 1 && $entrance_type == 1)
+		if(($signed_user_object["permissions"] == 1 && $entrance_type == 1) ||  ($signed_user_object["permissions"] == 2 && $entrance_type == 2))
 		{
-			write_to_session('session_user_id', $user_id);
-			echo json_encode('מנהל התחבר בהצלחה');		
-		}
-		else if($signed_user_object["permissions"] == 2 && $entrance_type == 2)
-		{
-			write_to_session('session_user_id', $user_id);
-			echo json_encode("success" . session_id());
+			// Set the update user connection status command text ...
+			$update_user_connection_status_command_text = "UPDATE users
+														   SET IsConnected = 1
+														   WHERE user_id = '$user_id'";
+
+			// Execute the update user connection status SQL command ...
+			$response_arr = execute_sql_command($update_user_connection_status_command_text);
+
+			// If updated successfully
+			if($response_arr[1])
+			{
+				if($signed_user_object["permissions"] == 1 && $entrance_type == 1)
+				{
+					$secret = get_captcha($signed_user_object["permissions"]);
+					if($secret == "Failed")
+					{
+						echo json_encode("Error verifing user");
+						exit();
+					}
+					$post = http_build_query(
+						array (
+							'response' => $response,
+							'secret' => $secret
+						)
+					);
+					$opts = array('http' => 
+						array (
+							'method' => 'POST',
+							'header' => 'application/x-www-form-urlencoded',
+							'content' => $post
+						)
+					);
+					$context = stream_context_create($opts);
+					$serverResponse = @file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
+
+					$captcha_success = json_decode($serverResponse);
+
+					if ($captcha_success->success == false) 
+					{
+						// This user was not verified by recaptcha
+						echo json_encode('User not verified');
+					}
+					else if ($captcha_success->success == true) 
+					{
+						// This user is verified by recaptcha
+						write_to_session('session_user_id', $user_id);
+						echo json_encode("success" . session_id());	
+					}
+				}
+				else if($signed_user_object["permissions"] == 2 && $entrance_type == 2)
+				{
+					write_to_session('session_user_id', $user_id);
+					echo json_encode("success" . session_id());	
+				}
+				else
+				{
+					echo json_encode("ההרשאות אינן תואמות");
+				}
+			}
+			else
+			{
+				echo json_encode('בעיה בעדכון חיבור למערכת');	
+			}
 		}
 		else
 		{
 			echo json_encode("ההרשאות אינן תואמות");
 			exit();
 		}
-		// Set the update user connection status command text ...
-		$update_user_connection_status_command_text = "UPDATE Users
-													   SET IsConnected = 1
-													   WHERE user_id = '$user_id'";
-
-		// Execute the update user connection status SQL command ...
-		execute_sql_command($update_user_connection_status_command_text);
+		
 	}
 	// If the user login details do not exist on database or one or more of the typed details is incorrect ...
 	else

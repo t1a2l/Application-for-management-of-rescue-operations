@@ -1,0 +1,212 @@
+<!DOCTYPE html5>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel = "stylesheet" href = "css/external/bootstrap.css" />
+		<link rel = "stylesheet" href = "css/external/bootstrap-rtl.css" />
+		<link rel="stylesheet" href="css/external/select2.min.css" />
+		<link rel="stylesheet" href="css/external/leaflet.css"/>
+		<link rel="stylesheet" href="css/external/leaflet.draw.css"/>
+		<link rel="stylesheet" href="../node_modules/leaflet-toolbar/dist/leaflet.toolbar.css"/>
+		<link rel="stylesheet" href="../node_modules/leaflet-draw-toolbar/dist/leaflet.draw-toolbar.css"/>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"/>
+		<link rel="stylesheet" href="css/Manager.css" />
+		<script src="js/external/jquery.js"></script>
+		<script src="js/external/jquery.form.js"></script>
+		<script src="js/external/bootstrap.min.js"></script>
+		<script src="js/external/select2.min.js"></script>
+		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3-dr-MD9cMEU2kogoVyshvrxDP8O574Q&language=iw"></script>
+		<script src="js/external/leaflet.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.13/leaflet.draw-src.js"></script>
+		<script src="../node_modules/leaflet-toolbar/dist/leaflet.toolbar-src.js"></script>
+		<script src="../node_modules/leaflet-draw-toolbar/dist/leaflet.draw-toolbar.js"></script>
+		<script src="../node_modules/leaflet-draw-toolbar/examples/ColorPicker.js"></script>
+		<script src="../node_modules/leaflet-draw-toolbar/examples/ShapeTitle.js"></script>
+		<script src="js/external/svg-icon.js"></script>
+		<script type="text/javascript" src="js/Manager.js"></script>
+		<script type="text/javascript" src="js/Functions.js"></script>
+		<script src='https://www.google.com/recaptcha/api.js'></script>
+	</head>
+	<body>
+<!-----------------------------------------Login Page Div------------------------------------------------------->
+		<div id="LoginPageDiv">
+			<h1>ניהול ואירגון יחידת חילוץ</h1>
+			<div class="contianer">
+				<div class="row">
+					<div class="col-sm-2 col-sm-offset-5">
+						<form id="SignInForm" class="SignInFormStyle">
+							<div class="form-group">
+								<h2><label for="InputUserName" class="SignInlabelStyle">שם משתמש:</label></h2>
+								<input type="text" class="form-control input-lg" id="InputUserName" placeholder="שם משתמש" value="">
+							</div>
+							<div class="form-group">
+								<h2><label for="InputPassword" class="SignInlabelStyle">סיסמא:</label></h2>
+								<input type="password" class="form-control input-lg" id="InputPassword" placeholder="סיסמא" value="">
+							</div>
+							<div class="g-recaptcha" data-sitekey="6LegIF4UAAAAACx2FSlE1pxJZUxEx4uaRq67HDkw"></div>
+							<button id="SignInSubmitBtn" type="submit" class="btn btn-primary SignInSubmitStyle">התחבר</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+<!-----------------------------------------Main Page Div-------------------------------------------------------->		
+		<div id="MainPageDiv">
+			<h1>ניהול ואירגון יחידת חילוץ</h1>
+			<div class="contianer">
+				<div class="row MainPageStyle">
+					<button type="button" class="btn btn-default btn-lg col-sm-2 col-sm-offset-2 newEventBtnStyle" id="newEventBtn">יצירת אירוע חדש</button>
+					<div class="col-sm-1"></div>
+					<button type="button" class="btn btn-default btn-lg col-sm-2 joinEventBtnStyle" id="joinEventBtn">הצטרפות לאירוע קיים</button>
+					<div class="col-sm-1"></div>
+					<button type="button" class="btn btn-default btn-lg col-sm-2 logoutBtnStyle" id="logoutBtn">התנתקות מהמערכת</button>
+					<div class="col-sm-1"></div>
+				</div>
+			</div>
+		</div>
+<!-----------------------------------------New Event Div--------------------------------------------------------->
+		<div id="NewEventDiv">
+			<h1>ניהול ואירגון יחידת חילוץ</h1>
+			<h3>פתיחת אירוע חדש</h3>
+			<div class="contianer">
+				<div class="row">
+					<div class="col-sm-2 col-sm-offset-5">
+						<div class="row">
+							<form id="NewEventForm" class="NewEventFormStyle">
+								<div class="form-group">
+									<h4><label for="EventName" class="LabelStyle">שם האירוע:</label></h4>
+									<input type="text" class="form-control input-lg" id="EventNam" name="EventName" placeholder="שם האירוע" value=""/>
+								</div>
+								<div class="form-group">
+									<h4><label for="EventLocation" class="LabelStyle">מיקום האירוע:</label></h4>
+									<div class="col-sm-2 selectCity">
+										<input type="radio" name="byType" value="City" checked/>
+									</div>
+									<div class="col-sm-8 selectCity">
+										<select class="form-control" id="EventLoc" name="EventLocation"></select>
+									</div>
+									<div class="col-sm-2">
+										<button id="RefreshBtn" type="button" class="btn btn-primary RefreshBtnStyle"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+									</div>
+									<div class="col-sm-3 selectCity">
+										<input type="radio" name="byType" value="Cords"/>
+									</div>
+									<div class="col-sm-7">
+										<label for="EventLocation" class="LabelStyle">בחר מהמפה:</label>
+									</div>
+									<div class="col-sm-2">
+										<button id="MapBtn" type="button" class="btn btn-primary MapBtnStyle"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span></button>
+									</div>
+								</div>
+								<div class="form-group">
+									<h4><label for="EventDescription" class="LabelStyle DescStyle" >תיאור האירוע:</label></h4>
+									<textarea class="form-control input-lg" id="EventDes" name="EventDescription" placeholder="תיאור האירוע" rows="3"></textarea>
+								</div>
+								<div class="form-group">
+									<h4><label for="EventLostPic" class="LabelStyle">תמונת הנעדר:</label></h4>
+									<input type="file" class="form-control input-lg" id="NewEventPicBtn" name="EventLostPic"/>
+									<p class="help-block help-style">הוסף את תמונת הנעדר</p>
+								</div>
+								<button id="EventCreateBtn" type="submit" class="btn btn-primary EventCreateBtnStyle" style="">צור אירוע</button>
+								<button id="BackBtn" type="button" class="btn btn-primary BackBtnStyle">חזרה</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!---------------Modal to choose location according to map coordinates------------------------------->
+			<div id="mapModal" class="modal fade">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header"></div>
+						<div class="modal-body">
+							<div id="map-canvas"></div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--------------------------Modal that shows image before saving it to new event------------------------>
+			<div id="imageNewEventModal" class="modal fade">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header"></div>
+						<div class="modal-body">
+							<img class="modal-content" id="NewEventPic">
+						</div>
+						<div class="modal-footer">
+							<button type="button" data-dismiss="modal" class="btn btn-primary">Accept</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+<!-----------------------------------------Join Event Div-------------------------------------------------------->
+		<div id="JoinEventDiv">
+			<h1>ניהול ואירגון יחידת חילוץ</h1>
+			<label id="eventChoose"></label>
+			<div id="Events" class="EventsStyle"></div>
+		</div>
+<!-----------------------------------------Active Event Div------------------------------------------------------>		
+		<div id="ActiveEventDiv">
+			<!-----------------------------------------Main view of the active event----------------------------->
+			<div class="contianer">
+				<h1 id="eventName"></h1>
+				<div class="row">
+					<div class="col-sm-2 col-sm-offset-2">
+						<div id="mapid" class=" mapStyle"></div>
+					</div>
+					<div class="col-sm-2 col-sm-offset-5">
+						<h3 id="eventId"></h3>
+					</div>
+					<div class="col-sm-2 col-sm-offset-5">
+						<h4 id="eventStartTime"></h4>
+					</div>
+					<div class="col-sm-2 col-sm-offset-5">
+						<button type="button" class="btn btn-default eventPicturesStyle" id="eventPictures">תמונות אירוע</button>
+					</div>
+					<div class="col-sm-3 col-sm-offset-5">
+						<label class="eventPicUploadLabelStyle" for="eventPicUpload">העלה תמונות</label>
+						<input type="file" class="eventPicUploadStyle" id="eventPicUpload"/>
+					</div>
+					<div class="col-sm-2 col-sm-offset-5">
+						<button type="button" class="btn btn-default endEventStyle" id="endEvent">סיים אירוע</button>
+					</div>
+				</div>
+			</div>
+			<!--------------------------Modal that shows image before uploading to server------------------------>
+			<div id="imageModal" class="modal fade">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header"></div>
+						<div class="modal-body">
+							<img class="modal-content" id="currentImage">
+						</div>
+						<div class="modal-footer">
+							<button id="sendPic" type="button" data-dismiss="modal" class="btn btn-primary">Send</button>
+							<button id="deletePic" type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!------------------------------Modal that shows current event images-------------------------------->
+			<div id="eventImagesModal" class="modal fade">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header"></div>
+						<div class="modal-body">
+							<img class="modal-content" id="currentEventImage">
+						</div>
+						<div class="modal-footer">
+							<button id="nextImage" type="button" class="btn btn-primary">next</button>
+							<button id="prevImage" type="button" class="btn btn-primary">preveiws</button>
+							<button id="CloseImages" type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
