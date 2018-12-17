@@ -1,0 +1,3 @@
+'SELECT * 
+											   FROM locations
+											   WHERE event_id = \'55\''

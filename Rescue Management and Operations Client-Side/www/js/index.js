@@ -251,19 +251,23 @@ var mainFunction = (function()
 		pic.append('imageUploadName', imageName);
 		pic.append('eventID', EventID);
 		pic.append('session_id', ActiveSession);
-		if(imageName != "")
+		if(document.getElementById("cameraImageName").value != "")
 		{
 			ajaxRequest(pic, webURL + "/img_upload.php", sendPicSuccess, false, false);
 		}
 		else
 		{
-			alert("No image name");
+			alert("Please enter an image name");
 		}
 	}
 	
 	function sendPicSuccess(response){
 		response = response.trim();
 		response = response.replace(/['"]+/g, '');
+		if(respone = "Image uploaded successfully")
+		{
+			$('#imageModal').modal('toggle');
+		}
 		alert(response);
 	}
 		
@@ -316,6 +320,7 @@ var mainFunction = (function()
 		var responseText = response.responseText;
 		responseText = responseText.replace(/(\r\n|\n|\r)/gm,"");
 		responseText = responseText.trim();
+		//alert(responseText);
 		if(foundPoint == 1)
 		{
 			foundPoint = 0;

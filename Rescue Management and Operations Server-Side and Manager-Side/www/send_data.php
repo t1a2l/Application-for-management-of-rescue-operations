@@ -53,7 +53,7 @@ if(isset($_SESSION['session_user_id']) && $_SESSION['session_user_id'] == $user_
 											   FROM locations
 											   WHERE event_id = '$event_id'";
 			
-		file_put_contents('text1.txt', var_export($event_users_locations_command_text, TRUE));
+		file_put_contents('text2.txt', var_export($event_users_locations_command_text, TRUE));
 		
 		// Initialize an array for the gps location of all users column names
 		$event_users_locations_column_names_array = array("location_id", "user_id", "user_name", "event_id", "latitude", "longitude", "timestamp", "found_point");

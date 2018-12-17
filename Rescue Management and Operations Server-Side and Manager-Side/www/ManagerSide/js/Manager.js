@@ -265,6 +265,7 @@ var mainFunction = (function()
 		container.append(row);
 		$('#Events').append(container);
 		$("#Events").show();
+		$("#BackBtnJoin").show();
 	}
 	
 	function chooseBtnColor(){ // Choose a background color of the event button
@@ -802,15 +803,22 @@ var mainFunction = (function()
 			});
 		});
 		
-		$(document).on("click", "#BackBtn", function(){ // Go back to the main menu from new event create
+		$(document).on("click", "#BackBtnNew", function(){ // Go back to the main menu from event create page
 			event.preventDefault();
 			$('#NewEventDiv').hide();
+			$('#MainPageDiv').show();
+		});
+		
+		$(document).on("click", "#BackBtnJoin", function(){ // Go back to the main menu from join event page
+			event.preventDefault();
+			$('#JoinEventDiv').hide();
 			$('#MainPageDiv').show();
 		});
 
 		$(document).on("click", "#joinEventBtn", function(){ // Return to active event
 			event.preventDefault();
 			$("#Events").html('');
+			$("#BackBtnJoin").hide();
 			$('#MainPageDiv').hide();
 			$('#JoinEventDiv').show();
 			GetEventProperties();

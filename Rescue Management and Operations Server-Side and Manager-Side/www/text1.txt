@@ -1,1 +1,1 @@
-'INSERT INTO `locations` (user_id, user_name, event_id, latitude,longitude,timestamp, found_point) VALUES , (\'7\', \'\', \'\', \'31.8023679\', \'35.2358827\', \'2018/06/15 07:22:29\', \'0\')'
+'INSERT INTO `locations` (`user_id`, `user_name`, `event_id`, `latitude`, `longitude`, `timestamp`, `found_point`) VALUES (\'9\', \'mos\', \'63\', \'31.74123745663\', \'35.11133825212\', \'2018-06-24 08:39:57\', \'0\')'

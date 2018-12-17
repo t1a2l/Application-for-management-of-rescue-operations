@@ -80,7 +80,7 @@ if(isset($_POST['event_id']))
 	else
 	{
 		// Update the users table with the event id
-		$insert_event_id_command_text = "UPDATE Users
+		$insert_event_id_command_text = "UPDATE users
 									     SET event_id = '$event_id'
 									     WHERE user_id = '$user_id'";
 		// Execute the query
