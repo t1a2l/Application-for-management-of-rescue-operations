@@ -2,7 +2,8 @@
 
 A system that help rescue teams to manage their people in the field while searching for missing persons. 
 
-The system consists of: 
+The system consists of:
+
 Manager side: 
 Secure web site that allows creating and managing new events and existing ones, creating search areas and follow the rescuers on the built-in map.
 
